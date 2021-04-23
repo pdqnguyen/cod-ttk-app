@@ -1,0 +1,153 @@
+[
+  {
+    "gun": "Kilo 141",
+    "fire_rate": 751,
+    "range_modifier": 0.595,
+    "ads": 409,
+    "sprint_to_fire": 263,
+    "tactical_sprint_to_fire": 392,
+    "bullet_velocity": 1299.9599999999998,
+    "reload_time": 2.36,
+    "damage_profile": [
+      {
+        "head": 42,
+        "chest": 28,
+        "stomach": 28,
+        "extremities": 28,
+        "dropoff": 0.0
+      },
+      {
+        "head": 34,
+        "chest": 23,
+        "stomach": 23,
+        "extremities": 23,
+        "dropoff": 48.6475
+      },
+      {
+        "head": 27,
+        "chest": 18,
+        "stomach": 18,
+        "extremities": 18,
+        "dropoff": 86.9275
+      }
+    ]
+  },
+  {
+    "gun": "AS VAL",
+    "fire_rate": 885,
+    "range_modifier": 0.26,
+    "ads": 230,
+    "sprint_to_fire": 217,
+    "tactical_sprint_to_fire": 313,
+    "bullet_velocity": 429.57,
+    "reload_time": 2.4000000000000004,
+    "damage_profile": [
+      {
+        "head": 47,
+        "chest": 37,
+        "stomach": 30,
+        "extremities": 30,
+        "dropoff": 0.0
+      },
+      {
+        "head": 36,
+        "chest": 28,
+        "stomach": 23,
+        "extremities": 23,
+        "dropoff": 40.32
+      }
+    ]
+  },
+  {
+    "gun": "FFAR",
+    "fire_rate": 900,
+    "range_modifier": 0.10000000000000009,
+    "ads": 502,
+    "sprint_to_fire": 179,
+    "tactical_sprint_to_fire": 275,
+    "bullet_velocity": 981.25,
+    "reload_time": 1.8199999999999998,
+    "damage_profile": [
+      {
+        "head": 45,
+        "chest": 33,
+        "stomach": 30,
+        "extremities": 30,
+        "dropoff": 0.0
+      },
+      {
+        "head": 37,
+        "chest": 27,
+        "stomach": 25,
+        "extremities": 25,
+        "dropoff": 39.6
+      }
+    ]
+  },
+  {
+    "gun": "MAC-10",
+    "fire_rate": 1118,
+    "range_modifier": 0.2100000000000002,
+    "ads": 225,
+    "sprint_to_fire": 143,
+    "tactical_sprint_to_fire": 238,
+    "bullet_velocity": 484.16,
+    "reload_time": 2,
+    "damage_profile": [
+      {
+        "head": 30,
+        "chest": 25,
+        "stomach": 25,
+        "extremities": 22,
+        "dropoff": 0.0
+      },
+      {
+        "head": 24,
+        "chest": 20,
+        "stomach": 20,
+        "extremities": 17,
+        "dropoff": 18.755000000000003
+      },
+      {
+        "head": 23,
+        "chest": 19,
+        "stomach": 19,
+        "extremities": 17,
+        "dropoff": 27.225000000000005
+      },
+      {
+        "head": 22,
+        "chest": 19,
+        "stomach": 19,
+        "extremities": 16,
+        "dropoff": 38.720000000000006
+      }
+    ]
+  },
+  {
+    "gun": "FFAR (2)",
+    "fire_rate": 900,
+    "range_modifier": 0.4630000000000003,
+    "ads": 354,
+    "sprint_to_fire": 220,
+    "tactical_sprint_to_fire": 312,
+    "bullet_velocity": 785,
+    "reload_time": 2.48,
+    "damage_profile": [
+      {
+        "head": 45,
+        "chest": 33,
+        "stomach": 30,
+        "extremities": 30,
+        "dropoff": 0.0
+      },
+      {
+        "head": 37,
+        "chest": 27,
+        "stomach": 25,
+        "extremities": 25,
+        "dropoff": 52.66800000000001
+      }
+    ]
+  }
+]

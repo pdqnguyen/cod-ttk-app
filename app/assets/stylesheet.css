@@ -1,0 +1,17 @@
+.modal-body li {
+    margin-bottom: 10px;
+}
+
+.rc-slider-track {
+    background-color: #3469ad;
+}
+
+.rc-slider-handle {
+    border: solid 3px #3469ad;
+    background-color: #1d3b61;
+}
+
+.custom-control-input:checked ~ .custom-control-label::before {
+    border-color: #3469ad;
+    background-color: #3469ad;
+}
