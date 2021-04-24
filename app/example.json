@@ -34,12 +34,93 @@
     ]
   },
   {
+    "gun": "FFAR",
+    "fire_rate": 900,
+    "range_modifier": 0.2210000000000003,
+    "ads": 354,
+    "sprint_to_fire": 220,
+    "tactical_sprint_to_fire": 312,
+    "bullet_velocity": 981.25,
+    "reload_time": 2.48,
+    "mag_size": 50,
+    "damage_profile": [
+      {
+        "head": 40,
+        "chest": 27,
+        "stomach": 27,
+        "extremities": 27,
+        "dropoff": 0.0
+      },
+      {
+        "head": 37,
+        "chest": 25,
+        "stomach": 25,
+        "extremities": 25,
+        "dropoff": 37.851000000000006
+      }
+    ]
+  },
+  {
+    "gun": "CR-56 AMAX",
+    "fire_rate": 630,
+    "range_modifier": 0.4520000000000002,
+    "ads": 444,
+    "sprint_to_fire": 263,
+    "tactical_sprint_to_fire": 392,
+    "bullet_velocity": 958.5709999999999,
+    "reload_time": 2.25,
+    "mag_size": 45,
+    "damage_profile": [
+      {
+        "head": 56,
+        "chest": 42,
+        "stomach": 35,
+        "extremities": 35,
+        "dropoff": 0.0
+      },
+      {
+        "head": 51,
+        "chest": 38,
+        "stomach": 32,
+        "extremities": 32,
+        "dropoff": 34.848000000000006
+      }
+    ]
+  },
+  {
+    "gun": "Grau 5.56",
+    "fire_rate": 730,
+    "range_modifier": 0.54,
+    "ads": 297,
+    "sprint_to_fire": 263,
+    "tactical_sprint_to_fire": 392,
+    "bullet_velocity": 1299.9599999999998,
+    "reload_time": 2.15,
+    "mag_size": 60,
+    "damage_profile": [
+      {
+        "head": 42,
+        "chest": 28,
+        "stomach": 28,
+        "extremities": 28,
+        "dropoff": 0.0
+      },
+      {
+        "head": 33,
+        "chest": 22,
+        "stomach": 22,
+        "extremities": 22,
+        "dropoff": 47.74
+      }
+    ]
+  },
+  {
     "gun": "AS VAL",
     "fire_rate": 885,
     "range_modifier": 0.26,
-    "ads": 230,
-    "sprint_to_fire": 217,
-    "tactical_sprint_to_fire": 313,
+    "ads": 285,
+    "sprint_to_fire": 263,
+    "tactical_sprint_to_fire": 392,
     "bullet_velocity": 429.57,
     "reload_time": 2.4000000000000004,
     "mag_size": 30,
@@ -57,101 +138,6 @@
         "stomach": 23,
         "extremities": 23,
         "dropoff": 40.32
-      }
-    ]
-  },
-  {
-    "gun": "FFAR",
-    "fire_rate": 900,
-    "range_modifier": 0.10000000000000009,
-    "ads": 502,
-    "sprint_to_fire": 179,
-    "tactical_sprint_to_fire": 275,
-    "bullet_velocity": 981.25,
-    "reload_time": 1.8199999999999998,
-    "mag_size": 50,
-    "damage_profile": [
-      {
-        "head": 40,
-        "chest": 27,
-        "stomach": 27,
-        "extremities": 27,
-        "dropoff": 0.0
-      },
-      {
-        "head": 37,
-        "chest": 25,
-        "stomach": 25,
-        "extremities": 25,
-        "dropoff": 34.1
-      }
-    ]
-  },
-  {
-    "gun": "MAC-10",
-    "fire_rate": 1118,
-    "range_modifier": 0.2100000000000002,
-    "ads": 225,
-    "sprint_to_fire": 143,
-    "tactical_sprint_to_fire": 238,
-    "bullet_velocity": 484.16,
-    "reload_time": 2,
-    "mag_size": 53,
-    "damage_profile": [
-      {
-        "head": 29,
-        "chest": 24,
-        "stomach": 24,
-        "extremities": 21,
-        "dropoff": 0.0
-      },
-      {
-        "head": 24,
-        "chest": 20,
-        "stomach": 20,
-        "extremities": 17,
-        "dropoff": 18.755000000000003
-      },
-      {
-        "head": 23,
-        "chest": 19,
-        "stomach": 19,
-        "extremities": 17,
-        "dropoff": 27.225000000000005
-      },
-      {
-        "head": 22,
-        "chest": 19,
-        "stomach": 19,
-        "extremities": 16,
-        "dropoff": 38.720000000000006
-      }
-    ]
-  },
-  {
-    "gun": "FFAR (2)",
-    "fire_rate": 900,
-    "range_modifier": 0.4630000000000003,
-    "ads": 354,
-    "sprint_to_fire": 220,
-    "tactical_sprint_to_fire": 312,
-    "bullet_velocity": 785,
-    "reload_time": 2.48,
-    "mag_size": 50,
-    "damage_profile": [
-      {
-        "head": 40,
-        "chest": 27,
-        "stomach": 27,
-        "extremities": 27,
-        "dropoff": 0.0
-      },
-      {
-        "head": 37,
-        "chest": 25,
-        "stomach": 25,
-        "extremities": 25,
-        "dropoff": 45.35300000000001
       }
     ]
   }
