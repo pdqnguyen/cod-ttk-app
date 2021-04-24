@@ -23,8 +23,8 @@ Recoil matters!
 
 ### Future work
 This is more or less a reminder for myself about things to implement.
-- Segment plot: horizontal bar showing dominant weapon at each distance bin.
-- Buttons to toggle weapons on/off for TTK chart.
-- Better hitbox geometry, or average over various hitboxes representing different encounter angles.
-- More advanced shot distribution. Tapered uniform distribution? Fit a distribution to actual recoil spreads?
-- Add reload time whenever magazine capacity is reached.
+- [ ] Segment plot: horizontal bar showing dominant weapon at each distance bin.
+- [ ] Buttons to toggle weapons on/off for TTK chart.
+- [ ] Better hitbox geometry, or average over various hitboxes representing different encounter angles.
+- [ ] More advanced shot distribution. Tapered uniform distribution? Fit a distribution to actual recoil spreads?
+- [x] Add reload time whenever magazine capacity is reached.
