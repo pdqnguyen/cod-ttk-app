@@ -62,7 +62,7 @@ def generate_target_map(shape, distance, aim_center, spread):
     return target_map
 
 
-def measure_stk_ttk(dpr, distance, wpn):
+def measure_stk_ttk(dpr, distance, wpn, ads=False):
     hp = 250.0
     stk = int(np.ceil(hp / dpr))
     rps = wpn['fire_rate'] / 60.
@@ -70,10 +70,12 @@ def measure_stk_ttk(dpr, distance, wpn):
     t_travel = distance / wpn['bullet_velocity']
     t_reload = wpn['reload_time'] * int((stk - 1) / wpn['mag_size'])
     ttk = hp / dps + t_travel + t_reload
+    if ads:
+        ttk += wpn['ads'] / 1000.
     return dps, stk, ttk
 
 
-def analyze(weapons, distances, center, hitbox=HITBOX, hitbox_regions=HITBOX_REGIONS):
+def analyze(weapons, distances, center, ads=False, hitbox=HITBOX, hitbox_regions=HITBOX_REGIONS):
     num_distances = len(distances)
     dps = {wpn['gun']: np.zeros(num_distances) for wpn in weapons}
     stk = {wpn['gun']: np.zeros(num_distances) for wpn in weapons}
@@ -105,8 +107,8 @@ def analyze(weapons, distances, center, hitbox=HITBOX, hitbox_regions=HITBOX_REG
                     spread = wpn['spread']
                     target_map = generate_target_map(dmg_map.shape, distance, center, spread)
                     dpr = np.sum(dmg_map * target_map)
-                    dps_segment[j], stk_segment[j], ttk_segment[j] = measure_stk_ttk(dpr, distance, wpn)
-                    dps_nr_segment[j], stk_nr_segment[j], ttk_nr_segment[j] = measure_stk_ttk(dpr_nr, distance, wpn)
+                    dps_segment[j], stk_segment[j], ttk_segment[j] = measure_stk_ttk(dpr, distance, wpn, ads=ads)
+                    dps_nr_segment[j], stk_nr_segment[j], ttk_nr_segment[j] = measure_stk_ttk(dpr_nr, distance, wpn, ads=ads)
                 dps[gun][segment] = dps_segment
                 stk[gun][segment] = stk_segment
                 ttk[gun][segment] = ttk_segment
@@ -119,7 +121,7 @@ def analyze(weapons, distances, center, hitbox=HITBOX, hitbox_regions=HITBOX_REG
     return results
 
 
-def plot_results(fig, distances, data, results, mode='ttk', log_x=False, log_y=False, show_nr=True):
+def plot_results(fig, distances, data, results, mode='ttk', log_x=False, log_y=False, show_nr=False):
     dps, stk, ttk, dps_nr, stk_nr, ttk_nr = results
     guns = list(stk.keys())
     fig.data = []
@@ -171,7 +173,7 @@ def plot_results(fig, distances, data, results, mode='ttk', log_x=False, log_y=F
     return fig
 
 
-def update_fig(fig, mode='ttk', log_x=False, log_y=False, show_nr=True):
+def update_fig(fig, mode='ttk', log_x=False, log_y=False, show_nr=False):
     fig_data = fig['data']
     if len(fig_data) > 0:
         x_max = max([max(trace['x']) for trace in fig_data])

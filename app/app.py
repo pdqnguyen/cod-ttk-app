@@ -373,6 +373,17 @@ app.layout = html.Div(
                             ])
                         ]),
                         html.Div([
+                            html.Div("Add ADS to TTK:", style={'display': 'inline-block'}),
+                            dbc.RadioItems(
+                                id='radio-plot-ads',
+                                options=[{'label': 'Yes', 'value': 'yes'},
+                                         {'label': 'No', 'value': 'no'}],
+                                value='yes',
+                                inline=True,
+                                style={'margin-left': 20, 'display': 'inline-block'},
+                            )
+                        ]),
+                        html.Div([
                             html.Div("Plot mode:", style={'display': 'inline-block'}),
                             dbc.RadioItems(
                                 id='radio-plot-mode',
@@ -383,11 +394,10 @@ app.layout = html.Div(
                                 inline=True,
                                 style={'margin-left': 20, 'display': 'inline-block'},
                             )
-                        ]),
+                        ], style={'margin-top': 5}),
                         html.Br(),
                         dbc.Button('Generate performance plot', id='plot-button', block=True),
-                        html.Br(),
-                        html.Div(id='perf-plot-err', style={'textAlign': 'center'}),
+                        html.Div("", id='perf-plot-err', style={'textAlign': 'center', 'margin-top': 5}),
                     ]
                 ), width=4
             ),
@@ -428,7 +438,7 @@ app.layout = html.Div(
                                 id='radio-show-nr',
                                 options=[{'label': 'Hide', 'value': 'hide'},
                                          {'label': 'Show', 'value': 'show'}],
-                                value='show',
+                                value='hide',
                                 inline=True,
                             ),
                         ], width=2),
@@ -657,12 +667,13 @@ def toggle_fetch_help(n_clicks, is_open):
      State('radio-plot-mode', 'value'),
      State('aim-x-input', 'value'),
      State('aim-y-input', 'value'),
+     State('radio-plot-ads', 'value'),
      State('radio-x-axis', 'value'),
      State('radio-y-axis', 'value'),
      State('radio-show-nr', 'value'),
      State('distance-input', 'value')] + spread_states
 )
-def generate_plot(n_clicks, data, mode, aim_x, aim_y, x_mode, y_mode, show_nr, d_max, *spreads):
+def generate_plot(n_clicks, data, mode, aim_x, aim_y, ads, x_mode, y_mode, show_nr, d_max, *spreads):
     button_id = get_button_pressed()
     plot = (button_id == 'plot-button')
     header = "Estimated performance plot"
@@ -680,7 +691,7 @@ def generate_plot(n_clicks, data, mode, aim_x, aim_y, x_mode, y_mode, show_nr, d
             aim_offset = (0.01 * aim_x, 0.01 * aim_y)
             aim_center = utils.get_aim_center(aim_offset)
             try:
-                results = utils.analyze(data, distances, aim_center)
+                results = utils.analyze(data, distances, aim_center, ads=(ads == 'yes'))
             except ValueError:
                 return fig, "Cross hair must overlap with enemy hit-box. " \
                            "Use the recoil spread visualizer below to see cross hair location"
