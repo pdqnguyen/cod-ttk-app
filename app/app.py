@@ -273,7 +273,7 @@ app.layout = html.Div(
 
         # ABOUT PAGE
         html.Div([
-            html.H2("Call of Duty weapon damage simulator", style={'display': 'inline-block'}),
+            html.H2("Call of Duty weapon performance tool", style={'display': 'inline-block'}),
             dbc.Button("What is this?", id='about-button', style={'float': 'right'}),
         ]),
         dbc.Modal(
