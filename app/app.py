@@ -254,6 +254,7 @@ def make_weapon_name_divs(rows):
 # BEGIN BUILDING THE APP
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.SLATE, 'assets/stylesheet.css'])
+server = app.server
 
 # Initialize main TTK/STK figure
 fig = go.Figure()
@@ -757,4 +758,4 @@ def update_image(aim_x, aim_y, dist, zoom, fov, wpn_idx, *spreads_and_data):
 
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server()#debug=True)
