@@ -372,10 +372,22 @@ app.layout = html.Div(
                                 dbc.Col(html.Div(id=f"distance-div"), width=3)
                             ])
                         ]),
+                        html.Div([
+                            html.Div("Plot mode:", style={'display': 'inline-block'}),
+                            dbc.RadioItems(
+                                id='radio-plot-mode',
+                                options=[{'label': 'TTK', 'value': 'ttk'},
+                                         {'label': 'STK', 'value': 'stk'},
+                                         {'label': 'DPS', 'value': 'dps'}],
+                                value='ttk',
+                                inline=True,
+                                style={'margin-left': 20, 'display': 'inline-block'},
+                            )
+                        ]),
                         html.Br(),
-                        dbc.Button('Generate TTK plot', id='plot-button', block=True),
+                        dbc.Button('Generate performance plot', id='plot-button', block=True),
                         html.Br(),
-                        html.Div(id='ttk-plot-err', style={'textAlign': 'center'}),
+                        html.Div(id='perf-plot-err', style={'textAlign': 'center'}),
                     ]
                 ), width=4
             ),
@@ -385,7 +397,7 @@ app.layout = html.Div(
 
         # TTK PLOT SECTION
         dbc.Card([
-            dbc.CardHeader("Recoil-adjusted TTK Chart", style={'font-size': 24, 'textAlign': 'center'}),
+            dbc.CardHeader("Estimated performance plot", id='perf-plot-header', style={'font-size': 24, 'textAlign': 'center'}),
             dbc.CardBody([
                 html.Div([
                     dbc.Row([
@@ -411,7 +423,7 @@ app.layout = html.Div(
                             ),
                         ], width=3),
                         dbc.Col([
-                            html.Div("Show TTK without recoil: ", style={'display': 'inline-block'}),
+                            html.Div("No-recoil results: ", style={'display': 'inline-block'}),
                             dbc.RadioItems(
                                 id='radio-show-nr',
                                 options=[{'label': 'Hide', 'value': 'hide'},
@@ -425,10 +437,10 @@ app.layout = html.Div(
                     html.Br(),
                     html.Center(
                         dcc.Loading(
-                            id='ttk-plot-loading',
+                            id='perf-plot-loading',
                             type='default',
                             children=dcc.Graph(
-                                id='ttk-plot-figure',
+                                id='perf-plot-figure',
                             )
                         ),
                     )
@@ -637,10 +649,12 @@ def toggle_fetch_help(n_clicks, is_open):
 
 
 @app.callback(
-    [Output('ttk-plot-figure', 'figure'),
-     Output('ttk-plot-err', 'children')],
+    [Output('perf-plot-figure', 'figure'),
+     Output('perf-plot-err', 'children'),
+     Output('perf-plot-header', 'children')],
     [Input('plot-button', 'n_clicks')],
     [State('weapons-data-store', 'value'),
+     State('radio-plot-mode', 'value'),
      State('aim-x-input', 'value'),
      State('aim-y-input', 'value'),
      State('radio-x-axis', 'value'),
@@ -648,53 +662,45 @@ def toggle_fetch_help(n_clicks, is_open):
      State('radio-show-nr', 'value'),
      State('distance-input', 'value')] + spread_states
 )
-def generate_plot(n_clicks, data, aim_x, aim_y, x_mode, y_mode, show_nr, d_max, *spreads):
+def generate_plot(n_clicks, data, mode, aim_x, aim_y, x_mode, y_mode, show_nr, d_max, *spreads):
     button_id = get_button_pressed()
     plot = (button_id == 'plot-button')
+    header = "Estimated performance plot"
 
-    if plot and len(data) > 0:
-        distances = np.linspace(1, d_max, d_max)
-        data, spreads = update_spreads(data, *spreads)
-        aim_offset = (0.01 * aim_x, 0.01 * aim_y)
-        aim_center = utils.get_aim_center(aim_offset)
-        try:
-            results = utils.analyze(data, distances, aim_center)
-        except ValueError:
-            return fig, "Cross hair must overlap with enemy hit-box. " \
-                       "Use the recoil spread visualizer below to see cross hair location"
-        log_x = (x_mode == 'log')
-        log_y = (y_mode == 'log')
-        utils.plot_results(fig, distances, data, results, log_x=log_x, log_y=log_y)
-        for trace in fig['data']:
-            trace.visible = ('(no recoil)' not in trace['name'] or show_nr == 'show')
-        return fig, ""
-    elif plot:
-        return fig, "No data found. Fetch data first!"
+    if plot:
+        header_mode = {
+            'ttk': " (Time-to-kill)",
+            'stk': " (Shots-to-kill)",
+            'dps': " (Damage per second)",
+        }
+        header += header_mode[mode]
+        if len(data) > 0:
+            distances = np.linspace(1, d_max, d_max)
+            data, spreads = update_spreads(data, *spreads)
+            aim_offset = (0.01 * aim_x, 0.01 * aim_y)
+            aim_center = utils.get_aim_center(aim_offset)
+            try:
+                results = utils.analyze(data, distances, aim_center)
+            except ValueError:
+                return fig, "Cross hair must overlap with enemy hit-box. " \
+                           "Use the recoil spread visualizer below to see cross hair location"
+            log_x = (x_mode == 'log')
+            log_y = (y_mode == 'log')
+            utils.plot_results(fig, distances, data, results, mode=mode, log_x=log_x, log_y=log_y, show_nr=show_nr)
+            return fig, "", header
+        else:
+            return fig, "No data found. Fetch data first!", header
     else:
-        return fig, ""
+        return fig, "", header
 
 
 @app.callback(
-    Output('ttk-plot-figure', 'figure'),
-    [Input('radio-x-axis', 'value'), Input('radio-y-axis', 'value'), Input('radio-show-nr', 'value')]
+    Output('perf-plot-figure', 'figure'),
+    [Input('radio-x-axis', 'value'), Input('radio-y-axis', 'value'), Input('radio-show-nr', 'value')],
+    [State('radio-plot-mode', 'value')]
 )
-def update_plot(x_mode, y_mode, show_nr):
-    fig_data = fig['data']
-    if len(fig_data) > 0:
-        x_max = max([max(trace['x']) for trace in fig_data])
-        y_min = min([min(trace['y']) for trace in fig_data])
-        y_max = max([max(trace['y']) for trace in fig_data])
-        if x_mode == 'log':
-            fig.update_xaxes(title_text="Distance [m]", range=[1, np.log10(x_max)], type='log', tickformat='.1r')
-        else:
-            fig.update_xaxes(title_text="Distance [m]", range=[0, x_max], type='linear')
-        if y_mode == 'log':
-            fig.update_yaxes(title_text="Time-to-kill [s]", range=[np.log10(y_min), np.log10(y_max)], type='log', tickformat='.1r')
-        else:
-            fig.update_yaxes(title_text="Time-to-kill [s]", range=[0, y_max], type='linear')
-        for trace in fig_data:
-            trace.visible = ('(no recoil)' not in trace['name'] or show_nr == 'show')
-    return fig
+def update_plot(x_mode, y_mode, show_nr, mode):
+    return utils.update_fig(fig, mode=mode, log_x=(x_mode == 'log'), log_y=(y_mode == 'log'), show_nr=show_nr)
 
 
 @app.callback(
