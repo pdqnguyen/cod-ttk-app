@@ -66,6 +66,7 @@ if __name__ == '__main__':
     # Test link 1: 'https://www.truegamedata.com?share=ge4jvU'
     # Test link 2: 'https://www.truegamedata.com?share=PQDWpQ'
     # Test link 3: 'https://www.truegamedata.com?share=7E4ESl'
+    # Test link 4: 'https://www.truegamedata.com?share=9xBkmS'
     parser = ArgumentParser()
     parser.add_argument("link")
     parser.add_argument("-o", "--output")
