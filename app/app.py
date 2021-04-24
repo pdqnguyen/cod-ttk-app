@@ -254,7 +254,7 @@ def make_weapon_name_divs(rows):
 # BEGIN BUILDING THE APP
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.SLATE, 'assets/stylesheet.css'])
-server = app.server
+# server = app.server
 
 # Initialize main TTK/STK figure
 fig = go.Figure()
@@ -531,17 +531,17 @@ for n in range(MAX_WEAPONS):
     spread_outputs.append(Output(f'spread-y-div-{n}', 'children'))
 
 
-@app.callback(
-    [Output('weapons-data-store', 'value')] + spread_outputs,
-    spread_inputs,
-    [State('weapons-data-store', 'value')]
-)
-def update_spread_divs(*args):
-    spreads = args[:-1]
-    data = args[-1]
-    if data is not None:
-        data, spreads = update_spreads(data, *spreads)
-    return data, *spreads
+# @app.callback(
+#     [Output('weapons-data-store', 'value')] + spread_outputs,
+#     spread_inputs,
+#     [State('weapons-data-store', 'value')]
+# )
+# def update_spread_divs(*args):
+#     spreads = args[:-1]
+#     data = args[-1]
+#     if data is not None:
+#         data, spreads = update_spreads(data, *spreads)
+#     return data, *spreads
 
 
 @app.callback(
@@ -607,16 +607,17 @@ def toggle_howto_modal(n1, n2, is_open):
 
 
 @app.callback(
-    [Output('weapons-data-store', 'value'),
+    [Output('weapons-data-store', 'data'),
      Output('weapons-data', 'children'),
      Output('wpn-dropdown', 'options'),
-     Output('wpn-dropdown', 'value')] + weapon_name_outputs,
+     Output('wpn-dropdown', 'value')] + weapon_name_outputs + spread_outputs,
     [Input('fetch-button', 'n_clicks'),
-     Input('example-button', 'n_clicks')],
-    [State('link-input', 'value')]
+     Input('example-button', 'n_clicks')] + spread_inputs,
+    [State('link-input', 'value'), State('weapons-data-store', 'data')]
 )
-def fetch_data(btn1, btn2, link):
-    data = []
+def fetch_data(btn1, btn2, *args):
+    spreads = args[:-2]
+    link, data = args[-2:]
     button_id = get_button_pressed()
     fetch = (button_id == 'fetch-button')
     example = (button_id == 'example-button')
@@ -638,6 +639,8 @@ def fetch_data(btn1, btn2, link):
             weapons.extend(["N/A" for _ in range(MAX_WEAPONS - len(weapons))])
         output_str = f"{len(data)} weapons found: " + ', '.join(weapons[:len(data)])
     else:
+        if data is not None:
+            data, spreads = update_spreads(data, *spreads)
         weapons = ["N/A" for _ in range(MAX_WEAPONS)]
         output_str = "Copy a share link and click 'Fetch data' to get started."
     weapon_options = [{'label': wpn, 'value': i} for i, wpn in enumerate(weapons) if wpn != 'N/A']
@@ -645,7 +648,7 @@ def fetch_data(btn1, btn2, link):
         weapon = weapon_options[0]['value']
     else:
         weapon = None
-    return (data,) + (output_str, weapon_options, weapon) + tuple(weapons)
+    return (data,) + (output_str, weapon_options, weapon) + tuple(weapons) + tuple(spreads)
 
 
 @app.callback(
@@ -663,21 +666,23 @@ def toggle_fetch_help(n_clicks, is_open):
     [Output('perf-plot-figure', 'figure'),
      Output('perf-plot-err', 'children'),
      Output('perf-plot-header', 'children')],
-    [Input('plot-button', 'n_clicks')],
-    [State('weapons-data-store', 'value'),
+    [Input('plot-button', 'n_clicks'),
+     Input('radio-x-axis', 'value'),
+     Input('radio-y-axis', 'value'),
+     Input('radio-show-nr', 'value')],
+    [State('weapons-data-store', 'data'),
      State('radio-plot-mode', 'value'),
      State('aim-x-input', 'value'),
      State('aim-y-input', 'value'),
      State('radio-plot-ads', 'value'),
-     State('radio-x-axis', 'value'),
-     State('radio-y-axis', 'value'),
-     State('radio-show-nr', 'value'),
      State('distance-input', 'value')] + spread_states
 )
-def generate_plot(n_clicks, data, mode, aim_x, aim_y, ads, x_mode, y_mode, show_nr, d_max, *spreads):
+def generate_plot(n_clicks, x_mode, y_mode, show_nr, data, mode, aim_x, aim_y, ads, d_max, *spreads):
     button_id = get_button_pressed()
     plot = (button_id == 'plot-button')
     header = "Estimated performance plot"
+    log_x = (x_mode == 'log')
+    log_y = (y_mode == 'log')
 
     if plot:
         header_mode = {
@@ -696,35 +701,24 @@ def generate_plot(n_clicks, data, mode, aim_x, aim_y, ads, x_mode, y_mode, show_
             except ValueError:
                 return fig, "Cross hair must overlap with enemy hit-box. " \
                            "Use the recoil spread visualizer below to see cross hair location"
-            log_x = (x_mode == 'log')
-            log_y = (y_mode == 'log')
             utils.plot_results(fig, distances, data, results, mode=mode, log_x=log_x, log_y=log_y, show_nr=show_nr)
             return fig, "", header
         else:
             return fig, "No data found. Fetch data first!", header
     else:
+        utils.update_fig(fig, mode=mode, log_x=log_x, log_y=log_y, show_nr=show_nr)
         return fig, "", header
 
 
 @app.callback(
-    Output('perf-plot-figure', 'figure'),
-    [Input('radio-x-axis', 'value'), Input('radio-y-axis', 'value'), Input('radio-show-nr', 'value')],
-    [State('radio-plot-mode', 'value')]
-)
-def update_plot(x_mode, y_mode, show_nr, mode):
-    return utils.update_fig(fig, mode=mode, log_x=(x_mode == 'log'), log_y=(y_mode == 'log'), show_nr=show_nr)
-
-
-@app.callback(
-    [Output('target-img', 'src'),
-     Output('target-err', 'children')],
+    Output('target-img', 'src'),
     [Input('aim-x-input', 'value'),
      Input('aim-y-input', 'value'),
      Input('target-distance-input', 'value'),
      Input('zoom-input', 'value'),
      Input('fov-input', 'value'),
      Input('wpn-dropdown', 'value')] + spread_inputs,
-    [State('weapons-data-store', 'value')]
+    [State('weapons-data-store', 'data')]
 )
 def update_image(aim_x, aim_y, dist, zoom, fov, wpn_idx, *spreads_and_data):
     """
@@ -744,18 +738,18 @@ def update_image(aim_x, aim_y, dist, zoom, fov, wpn_idx, *spreads_and_data):
     if data is not None:
         if len(data) > 0:
             if wpn_idx is None:
-                return "", "No weapon selected."
+                return ""
             data, spreads = update_spreads(data, *spreads)
             aim_offset = (0.01 * aim_x, 0.01 * aim_y)
             aim_center = utils.get_aim_center(aim_offset)
             target_fig = utils.plot_target_area(data[wpn_idx], dist, aim_center, zoom=zoom, fov=fov)
             target_fig_uri = fig_to_uri(target_fig)
-            return target_fig_uri, ""
+            return target_fig_uri
         else:
-            return "", ""
+            return ""
     else:
-        return "", ""
+        return ""
 
 
 if __name__ == '__main__':
-    app.run_server()#debug=True)
+    app.run_server(debug=True)
