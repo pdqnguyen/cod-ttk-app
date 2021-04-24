@@ -688,17 +688,17 @@ def toggle_fetch_help(n_clicks, is_open):
 def generate_plot(n_clicks, x_mode, y_mode, show_nr, data, mode, aim_x, aim_y, ads, d_max, *spreads):
     button_id = get_button_pressed()
     plot = (button_id == 'plot-button')
-    header = "Estimated performance plot"
+    header_mode = {
+        'ttk': "(Time-to-kill)",
+        'stk': "(Shots-to-kill)",
+        'dps': "(Damage per second)",
+    }
+    header = "Estimated performance plot " + header_mode[mode]
     log_x = (x_mode == 'log')
     log_y = (y_mode == 'log')
+    msg = ""
 
     if plot:
-        header_mode = {
-            'ttk': " (Time-to-kill)",
-            'stk': " (Shots-to-kill)",
-            'dps': " (Damage per second)",
-        }
-        header += header_mode[mode]
         if len(data) > 0:
             distances = np.linspace(1, d_max, d_max)
             data, spreads = update_spreads(data, *spreads)
@@ -710,12 +710,11 @@ def generate_plot(n_clicks, x_mode, y_mode, show_nr, data, mode, aim_x, aim_y, a
                 return fig, "Cross hair must overlap with enemy hit-box. " \
                            "Use the recoil spread visualizer below to see cross hair location"
             utils.plot_results(fig, distances, data, results, mode=mode, log_x=log_x, log_y=log_y, show_nr=show_nr)
-            return fig, "", header
         else:
-            return fig, "No data found. Fetch data first!", header
+            msg = "No data found. Fetch data first!"
     else:
         utils.update_fig(fig, mode=mode, log_x=log_x, log_y=log_y, show_nr=show_nr)
-        return fig, "", header
+    return fig, msg, header
 
 
 @app.callback(
