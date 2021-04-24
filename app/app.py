@@ -227,11 +227,10 @@ def make_recoil_divs(rows):
     out = []
     for i in range(rows):
         row = dbc.Row([
-            make_recoil_slider_col('x', i, width=4),
-            dbc.Col(html.Div(id=f"spread-x-div-{i}"), width=1),
-            dbc.Col(width=2),
-            make_recoil_slider_col('y', i, width=4),
-            dbc.Col(html.Div(id=f"spread-y-div-{i}"), width=1),
+            make_recoil_slider_col('x', i, width=5),
+            dbc.Col(html.Div(["1.0°"], id=f"spread-x-div-{i}"), width=1),
+            make_recoil_slider_col('y', i, width=5),
+            dbc.Col(html.Div(["1.0°"], id=f"spread-y-div-{i}"), width=1),
         ])
         out.append(row)
     return out
@@ -359,10 +358,9 @@ app.layout = html.Div(
                         html.Div([
                             html.Center("Crosshair offset (percent of enemy height)"),
                             dbc.Row([
-                                make_aim_slider_col('x', width=4),
+                                make_aim_slider_col('x', width=5),
                                 dbc.Col(html.Div(id=f"aim-x-div"), width=1),
-                                dbc.Col(width=2),
-                                make_aim_slider_col('y', width=4),
+                                make_aim_slider_col('y', width=5),
                                 dbc.Col(html.Div(id=f"aim-y-div"), width=1),
                             ]),
                         ], style={'width': '90%'}),
@@ -532,16 +530,18 @@ for n in range(MAX_WEAPONS):
 
 
 # @app.callback(
-#     [Output('weapons-data-store', 'value')] + spread_outputs,
+#     spread_outputs,
 #     spread_inputs,
-#     [State('weapons-data-store', 'value')]
+#     [State('weapons-data-store', 'data')]
 # )
 # def update_spread_divs(*args):
 #     spreads = args[:-1]
 #     data = args[-1]
 #     if data is not None:
-#         data, spreads = update_spreads(data, *spreads)
-#     return data, *spreads
+#         _, spreads = update_spreads(data, *spreads)
+#     else:
+#         _, spreads = update_spreads([], *spreads)
+#     return spreads
 
 
 @app.callback(
@@ -618,6 +618,10 @@ def toggle_howto_modal(n1, n2, is_open):
 def fetch_data(btn1, btn2, *args):
     spreads = args[:-2]
     link, data = args[-2:]
+    if data is not None:
+        data, spreads = update_spreads(data, *spreads)
+    else:
+        data, spreads = update_spreads([], *spreads)
     button_id = get_button_pressed()
     fetch = (button_id == 'fetch-button')
     example = (button_id == 'example-button')
@@ -625,30 +629,34 @@ def fetch_data(btn1, btn2, *args):
     if fetch:
         if 'share=' in link:
             data = get_weapons_data(link)
-            weapons = [d['gun'] for d in data]
-            if len(weapons) < MAX_WEAPONS:
-                weapons.extend(["N/A" for _ in range(MAX_WEAPONS - len(weapons))])
-            output_str = f"{len(data)} weapons found: " + ', '.join(weapons[:len(data)])
+            weapons, output_str = get_weapon_text(data)
         else:
             weapons = ["N/A" for _ in range(MAX_WEAPONS)]
             output_str = "Invalid link."
     elif example:
         data = EXAMPLE_DATA
-        weapons = [d['gun'] for d in data]
-        if len(weapons) < MAX_WEAPONS:
-            weapons.extend(["N/A" for _ in range(MAX_WEAPONS - len(weapons))])
-        output_str = f"{len(data)} weapons found: " + ', '.join(weapons[:len(data)])
+        weapons, output_str = get_weapon_text(data)
     else:
         if data is not None:
-            data, spreads = update_spreads(data, *spreads)
-        weapons = ["N/A" for _ in range(MAX_WEAPONS)]
-        output_str = "Copy a share link and click 'Fetch data' to get started."
+            weapons, output_str = get_weapon_text(data)
+        else:
+            data, spreads = update_spreads([], *spreads)
+            weapons = ["N/A" for _ in range(MAX_WEAPONS)]
+            output_str = "Copy a share link and click 'Fetch data' to get started."
     weapon_options = [{'label': wpn, 'value': i} for i, wpn in enumerate(weapons) if wpn != 'N/A']
     if len(weapon_options) > 0:
         weapon = weapon_options[0]['value']
     else:
         weapon = None
     return (data,) + (output_str, weapon_options, weapon) + tuple(weapons) + tuple(spreads)
+
+
+def get_weapon_text(data):
+    weapons = [d['gun'] for d in data]
+    if len(weapons) < MAX_WEAPONS:
+        weapons.extend(["N/A" for _ in range(MAX_WEAPONS - len(weapons))])
+    output_str = f"{len(data)} weapons found: " + ', '.join(weapons[:len(data)])
+    return weapons, output_str
 
 
 @app.callback(
