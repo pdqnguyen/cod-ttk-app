@@ -8,6 +8,7 @@
     "tactical_sprint_to_fire": 392,
     "bullet_velocity": 1299.9599999999998,
     "reload_time": 2.36,
+    "mag_size": 60,
     "damage_profile": [
       {
         "head": 42,
@@ -41,6 +42,7 @@
     "tactical_sprint_to_fire": 313,
     "bullet_velocity": 429.57,
     "reload_time": 2.4000000000000004,
+    "mag_size": 30,
     "damage_profile": [
       {
         "head": 47,
@@ -67,20 +69,21 @@
     "tactical_sprint_to_fire": 275,
     "bullet_velocity": 981.25,
     "reload_time": 1.8199999999999998,
+    "mag_size": 50,
     "damage_profile": [
       {
-        "head": 45,
-        "chest": 33,
-        "stomach": 30,
-        "extremities": 30,
+        "head": 40,
+        "chest": 27,
+        "stomach": 27,
+        "extremities": 27,
         "dropoff": 0.0
       },
       {
         "head": 37,
-        "chest": 27,
+        "chest": 25,
         "stomach": 25,
         "extremities": 25,
-        "dropoff": 39.6
+        "dropoff": 34.1
       }
     ]
   },
@@ -93,12 +96,13 @@
     "tactical_sprint_to_fire": 238,
     "bullet_velocity": 484.16,
     "reload_time": 2,
+    "mag_size": 53,
     "damage_profile": [
       {
-        "head": 30,
-        "chest": 25,
-        "stomach": 25,
-        "extremities": 22,
+        "head": 29,
+        "chest": 24,
+        "stomach": 24,
+        "extremities": 21,
         "dropoff": 0.0
       },
       {
@@ -133,20 +137,21 @@
     "tactical_sprint_to_fire": 312,
     "bullet_velocity": 785,
     "reload_time": 2.48,
+    "mag_size": 50,
     "damage_profile": [
       {
-        "head": 45,
-        "chest": 33,
-        "stomach": 30,
-        "extremities": 30,
+        "head": 40,
+        "chest": 27,
+        "stomach": 27,
+        "extremities": 27,
         "dropoff": 0.0
       },
       {
         "head": 37,
-        "chest": 27,
+        "chest": 25,
         "stomach": 25,
         "extremities": 25,
-        "dropoff": 52.66800000000001
+        "dropoff": 45.35300000000001
       }
     ]
   }

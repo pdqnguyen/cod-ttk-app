@@ -62,10 +62,13 @@ def generate_target_map(shape, distance, aim_center, spread):
     return target_map
 
 
-def measure_stk_ttk(dpr, distance, rpm, velocity):
-    rps = rpm / 60.
-    stk = int(np.ceil(250. / dpr))
-    ttk = 250. / (dpr * rps) + distance / velocity
+def measure_stk_ttk(dpr, distance, wpn):
+    hp = 250.0
+    stk = int(np.ceil(hp / dpr))
+    rps = wpn['fire_rate'] / 60.
+    t_travel = distance / wpn['bullet_velocity']
+    t_reload = wpn['reload_time'] * int(stk / wpn['mag_size'])
+    ttk = hp / (dpr * rps) + t_travel + t_reload
     return stk, ttk
 
 
@@ -97,10 +100,8 @@ def analyze(weapons, distances, center, hitbox=HITBOX, hitbox_regions=HITBOX_REG
                     spread = wpn['spread']
                     target_map = generate_target_map(dmg_map.shape, distance, center, spread)
                     dpr = np.sum(dmg_map * target_map)
-                    stk_segment[j], ttk_segment[j] = measure_stk_ttk(
-                        dpr, distance, wpn['fire_rate'], wpn['bullet_velocity'])
-                    stk_nr_segment[j], ttk_nr_segment[j] = measure_stk_ttk(
-                        dpr_nr, distance, wpn['fire_rate'], wpn['bullet_velocity'])
+                    stk_segment[j], ttk_segment[j] = measure_stk_ttk(dpr, distance, wpn)
+                    stk_nr_segment[j], ttk_nr_segment[j] = measure_stk_ttk(dpr_nr, distance, wpn)
                 stk[gun][segment] = stk_segment
                 ttk[gun][segment] = ttk_segment
                 stk_nr[gun][segment] = stk_nr_segment
@@ -111,13 +112,14 @@ def analyze(weapons, distances, center, hitbox=HITBOX, hitbox_regions=HITBOX_REG
     return results
 
 
-def plot_results(fig, distances, results, log_x=False, log_y=False):
+def plot_results(fig, distances, data, results, log_x=False, log_y=False):
     stk, ttk, stk_nr, ttk_nr = results
     guns = list(stk.keys())
     ttk_min = min([ttk[gun].min() for gun in guns])
     ttk_max = max([ttk[gun].max() for gun in guns])
     fig.data = []
     for i, gun in enumerate(guns):
+        wpn = data[i]
         color = DEFAULT_PLOTLY_COLORS[i]
         line1 = go.Scatter(
             mode='lines',
@@ -130,11 +132,23 @@ def plot_results(fig, distances, results, log_x=False, log_y=False):
             mode='lines',
             x=distances,
             y=ttk_nr[gun],
-            name=gun + '_nr',
+            name=gun + ' (no recoil)',
             line=dict(color=color, dash='dash'),
-            showlegend=False,
+            # showlegend=False,
         )
-        fig.add_traces([line1, line2])
+        traces = [line1, line2]
+        mag_cap = np.argmax(stk[gun] >= wpn['mag_size']) - 1
+        if mag_cap > 0:
+            line3 = go.Scatter(
+                mode='markers',
+                x=[distances[mag_cap]],
+                y=[ttk[gun][mag_cap]],
+                name=gun + ' mag cap',
+                marker=dict(color=color, size=10, symbol='star'),
+                showlegend=False,
+            )
+            traces.append(line3)
+        fig.add_traces(traces)
     if log_x:
         fig.update_xaxes(title_text="Distance [m]", range=[1, np.log10(max(distances))], type='log', tickformat='.1r')
     else:

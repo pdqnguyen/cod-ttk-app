@@ -68,18 +68,18 @@ def get_button_pressed():
     return button_id
 
 
-def update_spreads(*spreads):
+def update_spreads(data, *spreads):
     """
-    Update global data variable with recoil spreads and return spreads as strings for HTML outputs
+    Update data variable with recoil spreads and return spreads as strings for HTML outputs
 
+    :param data: TGD data
     :param spreads: list of recoil spreads [x1, y1, x2, y2, ...]
     :return: list of strings with degree symbol ["x1°", "y1°", ...]
     """
-    global data
     for i, wpn in enumerate(data):
         spread_x, spread_y = spreads[i * 2: i * 2 + 2]
         wpn['spread'] = (float(spread_x), float(spread_y))
-    return [f"{s:.1f}°" for s in spreads]
+    return data, [f"{s:.1f}°" for s in spreads]
 
 
 def make_slider_col(text, min, max, step, value, mark_values, mark_fmt, width):
@@ -117,7 +117,6 @@ def make_aim_slider_col(dim, width):
     Generate a Slider for cross hair aim offset in a Dash Bootstrap column
 
     :param dim:
-    :param num:
     :param width:
     :return:
     """
@@ -256,9 +255,6 @@ def make_weapon_name_divs(rows):
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.SLATE, 'assets/stylesheet.css'])
 
-# Global data variable for holding data fetched from TGD
-data = []
-
 # Initialize main TTK/STK figure
 fig = go.Figure()
 fig.update_layout(
@@ -318,6 +314,7 @@ app.layout = html.Div(
                 ], style={'width': '1200px', 'margin': '0 auto'})
             ]),
         ]),
+        dcc.Store(id='weapons-data-store'),
         html.Br(),
 
 
@@ -414,7 +411,7 @@ app.layout = html.Div(
                             ),
                         ], width=3),
                         dbc.Col([
-                            html.Div("Base TTK: ", style={'display': 'inline-block'}),
+                            html.Div("Show TTK without recoil: ", style={'display': 'inline-block'}),
                             dbc.RadioItems(
                                 id='radio-show-nr',
                                 options=[{'label': 'Hide', 'value': 'hide'},
@@ -512,11 +509,16 @@ for n in range(MAX_WEAPONS):
 
 
 @app.callback(
-    spread_outputs,
-    spread_inputs
+    [Output('weapons-data-store', 'value')] + spread_outputs,
+    spread_inputs,
+    [State('weapons-data-store', 'value')]
 )
-def update_spread_divs(*spreads):
-    return update_spreads(*spreads)
+def update_spread_divs(*args):
+    spreads = args[:-1]
+    data = args[-1]
+    if data is not None:
+        data, spreads = update_spreads(data, *spreads)
+    return data, *spreads
 
 
 @app.callback(
@@ -582,7 +584,8 @@ def toggle_howto_modal(n1, n2, is_open):
 
 
 @app.callback(
-    [Output('weapons-data', 'children'),
+    [Output('weapons-data-store', 'value'),
+     Output('weapons-data', 'children'),
      Output('wpn-dropdown', 'options'),
      Output('wpn-dropdown', 'value')] + weapon_name_outputs,
     [Input('fetch-button', 'n_clicks'),
@@ -590,7 +593,7 @@ def toggle_howto_modal(n1, n2, is_open):
     [State('link-input', 'value')]
 )
 def fetch_data(btn1, btn2, link):
-    global data
+    data = []
     button_id = get_button_pressed()
     fetch = (button_id == 'fetch-button')
     example = (button_id == 'example-button')
@@ -619,7 +622,7 @@ def fetch_data(btn1, btn2, link):
         weapon = weapon_options[0]['value']
     else:
         weapon = None
-    return (output_str, weapon_options, weapon) + tuple(weapons)
+    return (data,) + (output_str, weapon_options, weapon) + tuple(weapons)
 
 
 @app.callback(
@@ -637,21 +640,21 @@ def toggle_fetch_help(n_clicks, is_open):
     [Output('ttk-plot-figure', 'figure'),
      Output('ttk-plot-err', 'children')],
     [Input('plot-button', 'n_clicks')],
-    [State('aim-x-input', 'value'),
+    [State('weapons-data-store', 'value'),
+     State('aim-x-input', 'value'),
      State('aim-y-input', 'value'),
      State('radio-x-axis', 'value'),
      State('radio-y-axis', 'value'),
      State('radio-show-nr', 'value'),
      State('distance-input', 'value')] + spread_states
 )
-def generate_plot(n_clicks, aim_x, aim_y, x_mode, y_mode, show_nr, d_max, *spreads):
-    global data
+def generate_plot(n_clicks, data, aim_x, aim_y, x_mode, y_mode, show_nr, d_max, *spreads):
     button_id = get_button_pressed()
     plot = (button_id == 'plot-button')
 
     if plot and len(data) > 0:
         distances = np.linspace(1, d_max, d_max)
-        update_spreads(*spreads)
+        data, spreads = update_spreads(data, *spreads)
         aim_offset = (0.01 * aim_x, 0.01 * aim_y)
         aim_center = utils.get_aim_center(aim_offset)
         try:
@@ -661,11 +664,9 @@ def generate_plot(n_clicks, aim_x, aim_y, x_mode, y_mode, show_nr, d_max, *sprea
                        "Use the recoil spread visualizer below to see cross hair location"
         log_x = (x_mode == 'log')
         log_y = (y_mode == 'log')
-        utils.plot_results(fig, distances, results, log_x=log_x, log_y=log_y)
+        utils.plot_results(fig, distances, data, results, log_x=log_x, log_y=log_y)
         for trace in fig['data']:
-            name = trace['name']
-            if name[-3:] == '_nr':
-                trace.visible = (show_nr == 'show')
+            trace.visible = ('(no recoil)' not in trace['name'] or show_nr == 'show')
         return fig, ""
     elif plot:
         return fig, "No data found. Fetch data first!"
@@ -692,9 +693,7 @@ def update_plot(x_mode, y_mode, show_nr):
         else:
             fig.update_yaxes(title_text="Time-to-kill [s]", range=[0, y_max], type='linear')
         for trace in fig_data:
-            name = trace['name']
-            if name[-3:] == '_nr':
-                trace.visible = (show_nr == 'show')
+            trace.visible = ('(no recoil)' not in trace['name'] or show_nr == 'show')
     return fig
 
 
@@ -707,8 +706,9 @@ def update_plot(x_mode, y_mode, show_nr):
      Input('zoom-input', 'value'),
      Input('fov-input', 'value'),
      Input('wpn-dropdown', 'value')] + spread_inputs,
+    [State('weapons-data-store', 'value')]
 )
-def update_image(aim_x, aim_y, dist, zoom, fov, wpn_idx, *spreads):
+def update_image(aim_x, aim_y, dist, zoom, fov, wpn_idx, *spreads_and_data):
     """
     Update image of recoil spread and enemy hit-box
 
@@ -716,20 +716,25 @@ def update_image(aim_x, aim_y, dist, zoom, fov, wpn_idx, *spreads):
     :param aim_y:
     :param dist:
     :param zoom:
+    :param fov:
     :param wpn_idx:
-    :param spreads:
+    :param spreads_and_data:
     :return: figure URI, error message
     """
-    global data
-    if len(data) > 0:
-        if wpn_idx is None:
-            return "", "No weapon selected."
-        update_spreads(*spreads)
-        aim_offset = (0.01 * aim_x, 0.01 * aim_y)
-        aim_center = utils.get_aim_center(aim_offset)
-        target_fig = utils.plot_target_area(data[wpn_idx], dist, aim_center, zoom=zoom, fov=fov)
-        target_fig_uri = fig_to_uri(target_fig)
-        return target_fig_uri, ""
+    spreads = spreads_and_data[:-1]
+    data = spreads_and_data[-1]
+    if data is not None:
+        if len(data) > 0:
+            if wpn_idx is None:
+                return "", "No weapon selected."
+            data, spreads = update_spreads(data, *spreads)
+            aim_offset = (0.01 * aim_x, 0.01 * aim_y)
+            aim_center = utils.get_aim_center(aim_offset)
+            target_fig = utils.plot_target_area(data[wpn_idx], dist, aim_center, zoom=zoom, fov=fov)
+            target_fig_uri = fig_to_uri(target_fig)
+            return target_fig_uri, ""
+        else:
+            return "", ""
     else:
         return "", ""
 
