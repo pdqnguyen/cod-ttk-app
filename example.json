@@ -34,33 +34,6 @@
     ]
   },
   {
-    "gun": "FFAR",
-    "fire_rate": 900,
-    "range_modifier": 0.2210000000000003,
-    "ads": 354,
-    "sprint_to_fire": 220,
-    "tactical_sprint_to_fire": 312,
-    "bullet_velocity": 981.25,
-    "reload_time": 2.48,
-    "mag_size": 50,
-    "damage_profile": [
-      {
-        "head": 40,
-        "chest": 27,
-        "stomach": 27,
-        "extremities": 27,
-        "dropoff": 0.0
-      },
-      {
-        "head": 37,
-        "chest": 25,
-        "stomach": 25,
-        "extremities": 25,
-        "dropoff": 37.851000000000006
-      }
-    ]
-  },
-  {
     "gun": "CR-56 AMAX",
     "fire_rate": 630,
     "range_modifier": 0.4520000000000002,
@@ -88,10 +61,37 @@
     ]
   },
   {
+    "gun": "FFAR",
+    "fire_rate": 900,
+    "range_modifier": 0.32000000000000006,
+    "ads": 399,
+    "sprint_to_fire": 179,
+    "tactical_sprint_to_fire": 275,
+    "bullet_velocity": 879.2,
+    "reload_time": 2.48,
+    "mag_size": 50,
+    "damage_profile": [
+      {
+        "head": 40,
+        "chest": 27,
+        "stomach": 27,
+        "extremities": 27,
+        "dropoff": 0.0
+      },
+      {
+        "head": 37,
+        "chest": 25,
+        "stomach": 25,
+        "extremities": 25,
+        "dropoff": 40.92
+      }
+    ]
+  },
+  {
     "gun": "Grau 5.56",
     "fire_rate": 730,
     "range_modifier": 0.54,
-    "ads": 297,
+    "ads": 364,
     "sprint_to_fire": 263,
     "tactical_sprint_to_fire": 392,
     "bullet_velocity": 1299.9599999999998,
@@ -118,7 +118,7 @@
     "gun": "AS VAL",
     "fire_rate": 885,
     "range_modifier": 0.26,
-    "ads": 285,
+    "ads": 307,
     "sprint_to_fire": 263,
     "tactical_sprint_to_fire": 392,
     "bullet_velocity": 429.57,
