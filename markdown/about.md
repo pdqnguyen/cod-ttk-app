@@ -29,3 +29,7 @@ This is more or less a reminder for myself about things to implement.
 - [x] Add reload time whenever magazine capacity is reached.
 - [ ] Add a slider for enemy HP.
 - [ ] Add option of including/excluding reload time.
+- [ ] Show percentage of shots hitting each hitbox region (e.g. 10% head, 25% chest, etc.).
+- [ ] Related to the above, an alternative input option of inputting damage distribution at select distances,
+  and interpolating to approximate performance curves. Although easier, this would give likely give less
+  accurate results
