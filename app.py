@@ -68,7 +68,7 @@ def get_button_pressed():
     return button_id
 
 
-def update_spreads(data, *spreads):
+def add_spreads(data, *spreads):
     """
     Update data variable with recoil spreads and return spreads as strings for HTML outputs
 
@@ -255,17 +255,6 @@ def make_weapon_name_divs(rows):
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.SLATE, 'assets/stylesheet.css'])
 server = app.server
 
-# Initialize main TTK/STK figure
-fig = go.Figure()
-fig.update_layout(
-    width=1100,
-    height=500,
-    hovermode='x unified',
-    template='plotly_dark',
-)
-fig.update_xaxes(title_text="Distance [m]", range=[1, 100])
-fig.update_yaxes(title_text="Time-to-kill [s]", range=[1, 5])
-
 
 app.layout = html.Div(
     html.Div([
@@ -406,6 +395,7 @@ app.layout = html.Div(
 
         # PERFORMANCE PLOT SECTION
         dcc.Store(data='ttk', id='perf-plot-store'),
+        dcc.Store(id='results-store'),
         dbc.Card([
             dbc.CardHeader("Estimated performance plot", id='perf-plot-header', style={'font-size': 24, 'textAlign': 'center'}),
             dbc.CardBody([
@@ -530,21 +520,6 @@ for n in range(MAX_WEAPONS):
     spread_outputs.append(Output(f'spread-y-div-{n}', 'children'))
 
 
-# @app.callback(
-#     spread_outputs,
-#     spread_inputs,
-#     [State('weapons-data-store', 'data')]
-# )
-# def update_spread_divs(*args):
-#     spreads = args[:-1]
-#     data = args[-1]
-#     if data is not None:
-#         _, spreads = update_spreads(data, *spreads)
-#     else:
-#         _, spreads = update_spreads([], *spreads)
-#     return spreads
-
-
 @app.callback(
     [Output('aim-x-div', 'children'), Output('aim-y-div', 'children')],
     [Input('aim-x-input', 'value'), Input('aim-y-input', 'value')]
@@ -616,13 +591,13 @@ def toggle_howto_modal(n1, n2, is_open):
      Input('example-button', 'n_clicks')] + spread_inputs,
     [State('link-input', 'value'), State('weapons-data-store', 'data')]
 )
-def fetch_data(btn1, btn2, *args):
+def update_data(btn1, btn2, *args):
     spreads = args[:-2]
     link, data = args[-2:]
     if data is not None:
-        data, spreads = update_spreads(data, *spreads)
+        data, spread_labels = add_spreads(data, *spreads)
     else:
-        data, spreads = update_spreads([], *spreads)
+        data, spread_labels = add_spreads([], *spreads)
     button_id = get_button_pressed()
     fetch = (button_id == 'fetch-button')
     example = (button_id == 'example-button')
@@ -630,18 +605,20 @@ def fetch_data(btn1, btn2, *args):
     if fetch:
         if 'share=' in link:
             data = get_weapons_data(link)
+            data, spread_labels = add_spreads(data, *spreads)
             weapons, output_str = get_weapon_text(data)
         else:
             weapons = ["N/A" for _ in range(MAX_WEAPONS)]
             output_str = "Invalid link."
     elif example:
         data = EXAMPLE_DATA
+        data, spread_labels = add_spreads(data, *spreads)
         weapons, output_str = get_weapon_text(data)
     else:
         if data is not None:
+            data, spread_labels = add_spreads(data, *spreads)
             weapons, output_str = get_weapon_text(data)
         else:
-            data, spreads = update_spreads([], *spreads)
             weapons = ["N/A" for _ in range(MAX_WEAPONS)]
             output_str = "Copy a share link and click 'Fetch data' to get started."
     weapon_options = [{'label': wpn, 'value': i} for i, wpn in enumerate(weapons) if wpn != 'N/A']
@@ -649,7 +626,7 @@ def fetch_data(btn1, btn2, *args):
         weapon = weapon_options[0]['value']
     else:
         weapon = None
-    return (data,) + (output_str, weapon_options, weapon) + tuple(weapons) + tuple(spreads)
+    return (data,) + (output_str, weapon_options, weapon) + tuple(weapons) + tuple(spread_labels)
 
 
 def get_weapon_text(data):
@@ -675,7 +652,8 @@ def toggle_fetch_help(n_clicks, is_open):
     [Output('perf-plot-figure', 'figure'),
      Output('perf-plot-err', 'children'),
      Output('perf-plot-header', 'children'),
-     Output('perf-plot-store', 'data')],
+     Output('perf-plot-store', 'data'),
+     Output('results-store', 'data')],
     [Input('plot-button', 'n_clicks'),
      Input('radio-x-axis', 'value'),
      Input('radio-y-axis', 'value'),
@@ -683,12 +661,13 @@ def toggle_fetch_help(n_clicks, is_open):
     [State('weapons-data-store', 'data'),
      State('perf-plot-store', 'data'),
      State('radio-plot-mode', 'value'),
+     State('results-store', 'data'),
      State('aim-x-input', 'value'),
      State('aim-y-input', 'value'),
      State('radio-plot-ads', 'value'),
      State('distance-input', 'value')] + spread_states
 )
-def generate_plot(n_clicks, x_mode, y_mode, show_nr, data, stored_mode, new_mode, aim_x, aim_y, ads, d_max, *spreads):
+def update_plot(n_clicks, x_mode, y_mode, show_nr, data, stored_mode, new_mode, results, aim_x, aim_y, ads, d_max, *spreads):
     button_id = get_button_pressed()
     plot = (button_id == 'plot-button')
     header_mode = {
@@ -698,28 +677,32 @@ def generate_plot(n_clicks, x_mode, y_mode, show_nr, data, stored_mode, new_mode
     }
     log_x = (x_mode == 'log')
     log_y = (y_mode == 'log')
+    distances = np.linspace(1, d_max, d_max)
+    fig = None
     msg = ""
 
     if plot:
         mode = new_mode
         if len(data) > 0:
-            distances = np.linspace(1, d_max, d_max)
-            data, spreads = update_spreads(data, *spreads)
             aim_offset = (0.01 * aim_x, 0.01 * aim_y)
             aim_center = utils.get_aim_center(aim_offset)
             try:
                 results = utils.analyze(data, distances, aim_center, ads=(ads == 'yes'))
             except ValueError:
-                return fig, "Cross hair must overlap with enemy hit-box. " \
-                           "Use the recoil spread visualizer below to see cross hair location"
-            utils.plot_results(fig, distances, data, results, mode=mode, log_x=log_x, log_y=log_y, show_nr=show_nr)
+                msg = "Cross hair must overlap with enemy hit-box. "\
+                      "Use the recoil spread visualizer below to see cross hair location"
+            else:
+                fig = utils.plot_results(distances, data, results, mode=mode, log_x=log_x, log_y=log_y, show_nr=show_nr)
         else:
             msg = "No data found. Fetch data first!"
     else:
         mode = stored_mode
-        utils.update_fig(fig, mode=mode, log_x=log_x, log_y=log_y, show_nr=show_nr)
+        if data is not None and results is not None:
+            fig = utils.plot_results(distances, data, results, mode=mode, log_x=log_x, log_y=log_y, show_nr=show_nr)
     header = "Estimated performance plot " + header_mode[mode]
-    return fig, msg, header, mode
+    if fig is None:
+        fig = utils.plot_results(distances, data, results, mode=mode, log_x=log_x, log_y=log_y, show_nr=show_nr)
+    return fig, msg, header, mode, results
 
 
 @app.callback(
@@ -751,7 +734,7 @@ def update_image(aim_x, aim_y, dist, zoom, fov, wpn_idx, *spreads_and_data):
         if len(data) > 0:
             if wpn_idx is None:
                 return ""
-            data, spreads = update_spreads(data, *spreads)
+            data, spreads = add_spreads(data, *spreads)
             aim_offset = (0.01 * aim_x, 0.01 * aim_y)
             aim_center = utils.get_aim_center(aim_offset)
             target_fig = utils.plot_target_area(data[wpn_idx], dist, aim_center, zoom=zoom, fov=fov)

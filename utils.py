@@ -121,54 +121,62 @@ def analyze(weapons, distances, center, ads=False, hitbox=HITBOX, hitbox_regions
     return results
 
 
-def plot_results(fig, distances, data, results, mode='ttk', log_x=False, log_y=False, show_nr=False):
-    dps, stk, ttk, dps_nr, stk_nr, ttk_nr = results
-    guns = list(stk.keys())
-    fig.data = []
-    ymin = 1e99
-    ymax = -1e99
-    for i, gun in enumerate(guns):
-        assert (mode in ('dps', 'stk', 'ttk')), "invalid plot mode"
-        y = eval(mode)[gun]
-        y_nr = eval(mode + '_nr')[gun]
-        if min(y) < ymin:
-            ymin = min(y)
-        if max(y) > ymax:
-            ymax = max(y)
-        color = DEFAULT_PLOTLY_COLORS[i]
-        if mode == 'stk':
-            shape = 'hv'
-        else:
-            shape = 'linear'
-        traces = [
-            go.Scatter(
-                mode='lines',
-                x=distances,
-                y=y,
-                name=gun,
-                line=dict(color=color, shape=shape)
-            ),
-            go.Scatter(
-                mode='lines',
-                x=distances,
-                y=y_nr,
-                name=gun + ' (no recoil)',
-                line=dict(color=color, dash='dash', shape=shape),
-            )
-        ]
-        mag_cap = np.argmax(stk[gun] > data[i]['mag_size']) - 1
-        if mag_cap > 0:
-            traces.append(
+def plot_results(distances, data, results, mode='ttk', log_x=False, log_y=False, show_nr=False):
+    fig = go.Figure()
+    fig.update_layout(
+        width=1100,
+        height=500,
+        hovermode='x unified',
+        template='plotly_dark',
+    )
+    if results is not None:
+        dps, stk, ttk, dps_nr, stk_nr, ttk_nr = results
+        guns = list(stk.keys())
+        fig.data = []
+        y_min = 1e99
+        y_max = -1e99
+        for i, gun in enumerate(guns):
+            assert (mode in ('dps', 'stk', 'ttk')), "invalid plot mode"
+            y = eval(mode)[gun]
+            y_nr = eval(mode + '_nr')[gun]
+            if min(y) < y_min:
+                y_min = min(y)
+            if max(y) > y_max:
+                y_max = max(y)
+            color = DEFAULT_PLOTLY_COLORS[i]
+            if mode == 'stk':
+                shape = 'hv'
+            else:
+                shape = 'linear'
+            traces = [
                 go.Scatter(
-                    mode='markers',
-                    x=[distances[mag_cap]],
-                    y=[y[mag_cap]],
-                    name=gun + ' mag cap',
-                    marker=dict(color=color, size=15, symbol='star'),
-                    showlegend=False,
+                    mode='lines',
+                    x=distances,
+                    y=y,
+                    name=gun,
+                    line=dict(color=color, shape=shape)
+                ),
+                go.Scatter(
+                    mode='lines',
+                    x=distances,
+                    y=y_nr,
+                    name=gun + ' (no recoil)',
+                    line=dict(color=color, dash='dash', shape=shape),
                 )
-            )
-        fig.add_traces(traces)
+            ]
+            mag_cap = np.argmax(np.asarray(stk[gun]) > data[i]['mag_size']) - 1
+            if mag_cap > 0:
+                traces.append(
+                    go.Scatter(
+                        mode='markers',
+                        x=[distances[mag_cap]],
+                        y=[y[mag_cap]],
+                        name=gun + ' mag cap',
+                        marker=dict(color=color, size=15, symbol='star'),
+                        showlegend=False,
+                    )
+                )
+            fig.add_traces(traces)
     update_fig(fig, mode=mode, log_x=log_x, log_y=log_y, show_nr=show_nr)
     return fig
 
@@ -194,6 +202,9 @@ def update_fig(fig, mode='ttk', log_x=False, log_y=False, show_nr=False):
             fig.update_yaxes(title_text=y_label, range=[0, y_max], type='linear')
         for trace in fig_data:
             trace.visible = ('(no recoil)' not in trace['name'] or show_nr == 'show')
+    else:
+        fig.update_xaxes(title_text="Distance [m]", range=[1, 100])
+        fig.update_yaxes(title_text="Time-to-kill [s]", range=[1, 5])
     return fig
 
 
