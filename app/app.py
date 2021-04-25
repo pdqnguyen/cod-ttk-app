@@ -253,7 +253,7 @@ def make_weapon_name_divs(rows):
 # BEGIN BUILDING THE APP
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.SLATE, 'assets/stylesheet.css'])
-# server = app.server
+server = app.server
 
 # Initialize main TTK/STK figure
 fig = go.Figure()
@@ -404,7 +404,8 @@ app.layout = html.Div(
         html.Br(),
 
 
-        # TTK PLOT SECTION
+        # PERFORMANCE PLOT SECTION
+        dcc.Store(data='ttk', id='perf-plot-store'),
         dbc.Card([
             dbc.CardHeader("Estimated performance plot", id='perf-plot-header', style={'font-size': 24, 'textAlign': 'center'}),
             dbc.CardBody([
@@ -673,19 +674,21 @@ def toggle_fetch_help(n_clicks, is_open):
 @app.callback(
     [Output('perf-plot-figure', 'figure'),
      Output('perf-plot-err', 'children'),
-     Output('perf-plot-header', 'children')],
+     Output('perf-plot-header', 'children'),
+     Output('perf-plot-store', 'data')],
     [Input('plot-button', 'n_clicks'),
      Input('radio-x-axis', 'value'),
      Input('radio-y-axis', 'value'),
      Input('radio-show-nr', 'value')],
     [State('weapons-data-store', 'data'),
+     State('perf-plot-store', 'data'),
      State('radio-plot-mode', 'value'),
      State('aim-x-input', 'value'),
      State('aim-y-input', 'value'),
      State('radio-plot-ads', 'value'),
      State('distance-input', 'value')] + spread_states
 )
-def generate_plot(n_clicks, x_mode, y_mode, show_nr, data, mode, aim_x, aim_y, ads, d_max, *spreads):
+def generate_plot(n_clicks, x_mode, y_mode, show_nr, data, stored_mode, new_mode, aim_x, aim_y, ads, d_max, *spreads):
     button_id = get_button_pressed()
     plot = (button_id == 'plot-button')
     header_mode = {
@@ -693,12 +696,12 @@ def generate_plot(n_clicks, x_mode, y_mode, show_nr, data, mode, aim_x, aim_y, a
         'stk': "(Shots-to-kill)",
         'dps': "(Damage per second)",
     }
-    header = "Estimated performance plot " + header_mode[mode]
     log_x = (x_mode == 'log')
     log_y = (y_mode == 'log')
     msg = ""
 
     if plot:
+        mode = new_mode
         if len(data) > 0:
             distances = np.linspace(1, d_max, d_max)
             data, spreads = update_spreads(data, *spreads)
@@ -713,8 +716,10 @@ def generate_plot(n_clicks, x_mode, y_mode, show_nr, data, mode, aim_x, aim_y, a
         else:
             msg = "No data found. Fetch data first!"
     else:
+        mode = stored_mode
         utils.update_fig(fig, mode=mode, log_x=log_x, log_y=log_y, show_nr=show_nr)
-    return fig, msg, header
+    header = "Estimated performance plot " + header_mode[mode]
+    return fig, msg, header, mode
 
 
 @app.callback(
