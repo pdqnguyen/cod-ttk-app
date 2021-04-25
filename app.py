@@ -79,7 +79,7 @@ def add_spreads(data, *spreads):
     for i, wpn in enumerate(data):
         spread_x, spread_y = spreads[i * 2: i * 2 + 2]
         wpn['spread'] = (float(spread_x), float(spread_y))
-    return data, [f"{s:.1f}°" for s in spreads]
+    return data, [f"{s:.2f}°" for s in spreads]
 
 
 def make_slider_col(text, min, max, step, value, mark_values, mark_fmt, width):
@@ -101,11 +101,11 @@ def make_recoil_slider_col(dim, num, width):
     """
     col = make_slider_col(
         text=f"spread-{dim}-input-{num}",
-        min=0.1,
-        max=1.5,
-        step=0.1,
+        min=0.05,
+        max=2.51,
+        step=0.05,
         value=1.0,
-        mark_values=[0.5, 1],
+        mark_values=[1, 2],
         mark_fmt="{:.2f}°",
         width=width
     )
@@ -228,9 +228,9 @@ def make_recoil_divs(rows):
     for i in range(rows):
         row = dbc.Row([
             make_recoil_slider_col('x', i, width=5),
-            dbc.Col(html.Div(["1.0°"], id=f"spread-x-div-{i}"), width=1),
+            dbc.Col(html.Div(["1.00°"], id=f"spread-x-div-{i}"), width=1),
             make_recoil_slider_col('y', i, width=5),
-            dbc.Col(html.Div(["1.0°"], id=f"spread-y-div-{i}"), width=1),
+            dbc.Col(html.Div(["1.00°"], id=f"spread-y-div-{i}"), width=1),
         ])
         out.append(row)
     return out
