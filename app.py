@@ -19,10 +19,18 @@ from truegamedata import get_weapons_data
 MAX_WEAPONS = 5                             # Sets the number of rows of recoil measurement inputs
 DEFAULT_NUM_DISTANCES = 100                 # Number of distances at which to compute TTK/STK
 DEFAULT_MAX_DISTANCE = 100                  # Max analysis distance in meters
-DEFAULT_AIM_OFFSET = (0, 20)                # Offset from image center as (% of image width, % of image height)
+# DEFAULT_AIM_OFFSET = (0, 20)                # Offset from image center as (% of image width, % of image height)
 DEFAULT_TARGET_DISTANCE = 50
 DEFAULT_ZOOM = 4
 DEFAULT_FOV = 80
+
+# Offset from image center as (fraction of image width, fraction of image height)
+AIM_CENTER_DICT = {
+    'stomach': (0.05, 0.05),
+    'stomach/chest': (0.0, 0.15),
+    'chest': (0.0, 0.25),
+    'head': (-0.05, 0.40),
+}
 
 
 # Pre-saved data for testing so we don't have to scrape TGD every time
@@ -107,31 +115,6 @@ def make_recoil_slider_col(dim, num, width):
         value=1.0,
         mark_values=[1, 2],
         mark_fmt="{:.2f}°",
-        width=width
-    )
-    return col
-
-
-def make_aim_slider_col(dim, width):
-    """
-    Generate a Slider for cross hair aim offset in a Dash Bootstrap column
-
-    :param dim:
-    :param width:
-    :return:
-    """
-    if dim == 'x':
-        value = DEFAULT_AIM_OFFSET[0]
-    else:
-        value = DEFAULT_AIM_OFFSET[1]
-    col = make_slider_col(
-        text=f"aim-{dim}-input",
-        min=-50,
-        max=50,
-        step=5,
-        value=value,
-        mark_values=[-50, 0, 50],
-        mark_fmt="{:.0f}%",
         width=width
     )
     return col
@@ -322,7 +305,8 @@ app.layout = html.Div(
             size='lg',
         ),
         dbc.Row([
-            dbc.Col(html.Div([html.Br(), html.Br()] + make_weapon_name_divs(MAX_WEAPONS)), width=2),
+            dbc.Col(html.Div([html.Br(), html.Br()] + make_weapon_name_divs(MAX_WEAPONS)),
+                    width=2, style={'textAlign': 'center'}),
             dbc.Col(
                 html.Div(
                     [
@@ -345,13 +329,14 @@ app.layout = html.Div(
                 html.Div(
                     [
                         html.Div([
-                            html.Center("Crosshair offset (percent of enemy height)"),
-                            dbc.Row([
-                                make_aim_slider_col('x', width=5),
-                                dbc.Col(html.Div(id=f"aim-x-div"), width=1),
-                                make_aim_slider_col('y', width=5),
-                                dbc.Col(html.Div(id=f"aim-y-div"), width=1),
-                            ]),
+                            html.Center("Aim center"),
+                            dbc.RadioItems(
+                                id='radio-aim-center',
+                                options=[{'label': k, 'value': k} for k in AIM_CENTER_DICT.keys()],
+                                value=list(AIM_CENTER_DICT.keys())[0],
+                                inline=True,
+                                style={'margin-left': 20, 'display': 'inline-block', 'textAlign': 'center'},
+                            )
                         ], style={'width': '90%'}),
                         html.Div([
                             html.Center("Max distance (meters)"),
@@ -521,14 +506,6 @@ for n in range(MAX_WEAPONS):
 
 
 @app.callback(
-    [Output('aim-x-div', 'children'), Output('aim-y-div', 'children')],
-    [Input('aim-x-input', 'value'), Input('aim-y-input', 'value')]
-)
-def update_aim_divs(*args):
-    return [f"{s}%" for s in args]
-
-
-@app.callback(
     Output('distance-div', 'children'),
     Input('distance-input', 'value')
 )
@@ -662,12 +639,11 @@ def toggle_fetch_help(n_clicks, is_open):
      State('perf-plot-store', 'data'),
      State('radio-plot-mode', 'value'),
      State('results-store', 'data'),
-     State('aim-x-input', 'value'),
-     State('aim-y-input', 'value'),
+     State('radio-aim-center', 'value'),
      State('radio-plot-ads', 'value'),
      State('distance-input', 'value')] + spread_states
 )
-def update_plot(n_clicks, x_mode, y_mode, show_nr, data, stored_mode, new_mode, results, aim_x, aim_y, ads, d_max, *spreads):
+def update_plot(n_clicks, x_mode, y_mode, show_nr, data, stored_mode, new_mode, results, aim_center_select, ads, d_max, *spreads):
     button_id = get_button_pressed()
     plot = (button_id == 'plot-button')
     header_mode = {
@@ -684,8 +660,7 @@ def update_plot(n_clicks, x_mode, y_mode, show_nr, data, stored_mode, new_mode, 
     if plot:
         mode = new_mode
         if len(data) > 0:
-            aim_offset = (0.01 * aim_x, 0.01 * aim_y)
-            aim_center = utils.get_aim_center(aim_offset)
+            aim_center = utils.get_aim_center(AIM_CENTER_DICT[aim_center_select])
             try:
                 results = utils.analyze(data, distances, aim_center, ads=(ads == 'yes'))
             except ValueError:
@@ -707,20 +682,18 @@ def update_plot(n_clicks, x_mode, y_mode, show_nr, data, stored_mode, new_mode, 
 
 @app.callback(
     Output('target-img', 'src'),
-    [Input('aim-x-input', 'value'),
-     Input('aim-y-input', 'value'),
+    [Input('radio-aim-center', 'value'),
      Input('target-distance-input', 'value'),
      Input('zoom-input', 'value'),
      Input('fov-input', 'value'),
      Input('wpn-dropdown', 'value')] + spread_inputs,
     [State('weapons-data-store', 'data')]
 )
-def update_image(aim_x, aim_y, dist, zoom, fov, wpn_idx, *spreads_and_data):
+def update_image(aim_center_select, dist, zoom, fov, wpn_idx, *spreads_and_data):
     """
     Update image of recoil spread and enemy hit-box
 
-    :param aim_x:
-    :param aim_y:
+    :param aim_center_pct:
     :param dist:
     :param zoom:
     :param fov:
@@ -735,8 +708,7 @@ def update_image(aim_x, aim_y, dist, zoom, fov, wpn_idx, *spreads_and_data):
             if wpn_idx is None:
                 return ""
             data, spreads = add_spreads(data, *spreads)
-            aim_offset = (0.01 * aim_x, 0.01 * aim_y)
-            aim_center = utils.get_aim_center(aim_offset)
+            aim_center = utils.get_aim_center(AIM_CENTER_DICT[aim_center_select])
             target_fig = utils.plot_target_area(data[wpn_idx], dist, aim_center, zoom=zoom, fov=fov)
             target_fig_uri = fig_to_uri(target_fig)
             return target_fig_uri
