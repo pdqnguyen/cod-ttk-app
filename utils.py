@@ -50,14 +50,19 @@ def generate_dmg_maps(profile, hitbox=HITBOX, hitbox_regions=HITBOX_REGIONS):
     return out
 
 
-def generate_target_map(shape, distance, aim_center, spread):
+def generate_target_map(shape, distance, aim_center, spread, gaussian=True, gaussian_scale=3.):
     x_spread = spread[0] * (np.pi / 180.) * distance * IM_SCALE
     y_spread = spread[1] * (np.pi / 180.) * distance * IM_SCALE
-    target_map = np.zeros(shape, dtype=float)
     Y, X = np.meshgrid(range(shape[0]), range(shape[1]))
     xa, xb = aim_center[0] - x_spread / 2, aim_center[0] + x_spread / 2
     ya, yb = aim_center[1] - y_spread / 2, aim_center[1] + y_spread / 2
-    target_map[(X > xa) & (X < xb) & (Y > ya) & (Y < yb)] = 1
+    if gaussian:
+        x_sigma = x_spread / gaussian_scale
+        y_sigma = y_spread / gaussian_scale
+        target_map = np.exp(-((X - aim_center[0]) / x_sigma) ** 2 - ((Y - aim_center[1]) / y_sigma) ** 2)
+    else:
+        target_map = np.zeros(shape, dtype=float)
+        target_map[(X > xa) & (X < xb) & (Y > ya) & (Y < yb)] = 1
     target_map /= target_map.sum()
     return target_map
 
@@ -188,7 +193,10 @@ def update_fig(fig, mode='ttk', log_x=False, log_y=False, show_nr=False):
         y_min = min([min(trace['y']) for trace in fig_data])
         y_max = max([max(trace['y']) for trace in fig_data])
         if log_x:
-            fig.update_xaxes(title_text="Distance [m]", range=[1, np.log10(x_max)], type='log', tickformat='.1r')
+            if x_max >= 100:
+                fig.update_xaxes(title_text="Distance [m]", range=[1, np.log10(x_max)], type='log', tickformat='.1r')
+            else:
+                fig.update_xaxes(title_text="Distance [m]", range=[1, np.log10(x_max)], type='log', tickformat=None)
         else:
             fig.update_xaxes(title_text="Distance [m]", range=[0, x_max], type='linear')
         y_label = {
@@ -197,7 +205,10 @@ def update_fig(fig, mode='ttk', log_x=False, log_y=False, show_nr=False):
             'ttk': "Time-to-kill [s]",
         }[mode]
         if log_y:
-            fig.update_yaxes(title_text=y_label, range=[np.log10(y_min), np.log10(y_max)], type='log', tickformat='.1r')
+            if y_max > 10 * y_min:
+                fig.update_yaxes(title_text=y_label, range=[np.log10(y_min), np.log10(y_max)], type='log', tickformat='.1r')
+            else:
+                fig.update_yaxes(title_text=y_label, range=[np.log10(y_min), np.log10(y_max)], type='log')
         else:
             fig.update_yaxes(title_text=y_label, range=[0, y_max], type='linear')
         for trace in fig_data:
@@ -223,19 +234,22 @@ def plot_target_area(weapon_data, distance, center, zoom=1, fov=80, hitbox=HITBO
     fov_rad = fov * np.pi / 180.
     screen_width = 10
     screen_aspect = 16 / 9.
-    # im_center = (int(hitbox.shape[0] / 2), int(hitbox.shape[1] / 2))
     spread = weapon_data['spread']
     x_spread = spread[0] * (np.pi / 180.) * distance * IM_SCALE
     y_spread = spread[1] * (np.pi / 180.) * distance * IM_SCALE
     target_x0 = center[0] - x_spread / 2
     target_y0 = center[1] - y_spread / 2
-    target_rect = patches.Rectangle((target_x0, target_y0), x_spread, y_spread,
-                                    linewidth=1, edgecolor='r', facecolor='none')
+    # target_rect = patches.Rectangle((target_x0, target_y0), x_spread, y_spread,
+    #                                 linewidth=1, linestyle=':', edgecolor='r', facecolor='none')
+    target_map = generate_target_map(hitbox.shape, distance, center, spread)
     fig, ax = plt.subplots(1, 1, figsize=(screen_width, screen_width / screen_aspect))
     ax.set_position([0, 0, 1, 1])
     ax.imshow(hitbox.T, origin='lower', cmap='gray')
-    ax.plot(center[0], center[1], 'r+', ms=10)
-    ax.add_patch(target_rect)
+    ax.imshow(target_map.T, origin='lower', cmap='copper', alpha=0.8)
+    ax.plot([target_x0, target_x0 + x_spread], [center[1], center[1]], color='r')
+    ax.plot([center[0], center[0]], [target_y0, target_y0 + y_spread], color='r')
+    # ax.plot(center[0], center[1], 'y+', ms=30)
+    # ax.add_patch(target_rect)
     ax.set_aspect('equal')
     ax.set_xlim(
         center[0] - 0.5 * fov_rad * distance * IM_SCALE / zoom,
@@ -246,6 +260,4 @@ def plot_target_area(weapon_data, distance, center, zoom=1, fov=80, hitbox=HITBO
         center[1] + 0.5 * fov_rad * distance * IM_SCALE / screen_aspect / zoom
     )
     plt.axis('off')
-    # ax.set_xticks([])
-    # ax.set_yticks([])
     return fig
