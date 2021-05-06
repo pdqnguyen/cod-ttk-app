@@ -14,7 +14,12 @@ import utils
 from truegamedata import get_weapons_data
 
 
-# Defaults
+# Default app properties
+
+APP_TITLE = "Call of Duty weapon performance tool"
+
+
+# Default parameters
 
 MAX_WEAPONS = 5                             # Sets the number of rows of recoil measurement inputs
 DEFAULT_NUM_DISTANCES = 100                 # Number of distances at which to compute TTK/STK
@@ -235,7 +240,7 @@ def make_weapon_name_divs(rows):
 
 # BEGIN BUILDING THE APP
 
-app = dash.Dash(__name__, external_stylesheets=[dbc.themes.SLATE, 'assets/stylesheet.css'])
+app = dash.Dash(__name__, title=APP_TITLE, external_stylesheets=[dbc.themes.SLATE, 'assets/stylesheet.css'])
 server = app.server
 
 
@@ -245,7 +250,7 @@ app.layout = html.Div(
 
         # ABOUT PAGE
         html.Div([
-            html.H2("Call of Duty weapon performance tool", style={'display': 'inline-block'}),
+            html.H2(APP_TITLE, style={'display': 'inline-block'}),
             dbc.Button("What is this?", id='about-button', style={'float': 'right'}),
         ]),
         dbc.Modal(
