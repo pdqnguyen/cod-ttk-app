@@ -27,11 +27,11 @@ IM_SCALE = MODEL_HEIGHT_RATIO / MODEL_HEIGHT_METERS * HITBOX.shape[1]
 
 
 def get_aim_center(offset, hitbox=HITBOX):
-    offset_x = offset[0] * MODEL_HEIGHT_RATIO
-    offset_y = offset[1] * MODEL_HEIGHT_RATIO
+    offset_x = int(offset[0] * IM_SCALE)
+    offset_y = int(offset[1] * IM_SCALE)
     im_center = (int(hitbox.shape[0] / 2), int(hitbox.shape[1] / 2))
-    aim_x = im_center[0] + int(offset_x * hitbox.shape[0])
-    aim_y = im_center[1] + int(offset_y * hitbox.shape[1])
+    aim_x = im_center[0] + offset_x
+    aim_y = im_center[1] + offset_y
     center = (aim_x, aim_y)
     return center
 

@@ -23,17 +23,16 @@ APP_TITLE = "Call of Duty weapon performance tool"
 MAX_WEAPONS = 5                             # Sets the number of rows of recoil measurement inputs
 DEFAULT_NUM_DISTANCES = 100                 # Number of distances at which to compute TTK/STK
 DEFAULT_MAX_DISTANCE = 100                  # Max analysis distance in meters
-# DEFAULT_AIM_OFFSET = (0, 20)                # Offset from image center as (% of image width, % of image height)
 DEFAULT_TARGET_DISTANCE = 50
 DEFAULT_ZOOM = 4
 DEFAULT_FOV = 80
 
-# Offset from image center as (fraction of image width, fraction of image height)
+# Offset from image center in meters (horizontal, vertical)
 AIM_CENTER_DICT = {
-    'stomach': (0.05, 0.05),
-    'stomach/chest': (0.0, 0.15),
-    'chest': (0.0, 0.25),
-    'head': (-0.05, 0.40),
+    # 'stomach': (0.07, 0.07),
+    'stomach/chest': (0.03, 0.28),
+    'chest': (0.0, 0.45),
+    'head': (-0.07, 0.72),
 }
 
 
