@@ -1,10 +1,6 @@
-import json
-import sys
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib import ticker
 import matplotlib.patches as patches
-from argparse import ArgumentParser
 
 import plotly.graph_objects as go
 from plotly.colors import DEFAULT_PLOTLY_COLORS
