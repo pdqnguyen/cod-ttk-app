@@ -663,14 +663,8 @@ def update_plot(n_clicks, x_mode, y_mode, show_nr, data, stored_mode, new_mode, 
     if plot:
         mode = new_mode
         if len(data) > 0:
-            aim_center = utils.get_aim_center(AIM_CENTER_DICT[aim_center_select])
-            try:
-                results = utils.analyze(data, distances, aim_center, ads=(ads == 'yes'))
-            except ValueError:
-                msg = "Cross hair must overlap with enemy hit-box. "\
-                      "Use the recoil spread visualizer below to see cross hair location"
-            else:
-                fig = utils.plot_results(distances, data, results, mode=mode, log_x=log_x, log_y=log_y, show_nr=show_nr)
+            results = utils.analyze(data, distances, AIM_CENTER_DICT[aim_center_select], ads=(ads == 'yes'))
+            fig = utils.plot_results(distances, data, results, mode=mode, log_x=log_x, log_y=log_y, show_nr=show_nr)
         else:
             msg = "No data found. Fetch data first!"
     else:
@@ -711,8 +705,7 @@ def update_image(aim_center_select, dist, zoom, fov, wpn_idx, *spreads_and_data)
             if wpn_idx is None:
                 return ""
             data, spreads = add_spreads(data, *spreads)
-            aim_center = utils.get_aim_center(AIM_CENTER_DICT[aim_center_select])
-            target_fig = utils.plot_target_area(data[wpn_idx], dist, aim_center, zoom=zoom, fov=fov)
+            target_fig = utils.plot_target_area(data[wpn_idx], dist, AIM_CENTER_DICT[aim_center_select], zoom=zoom, fov=fov)
             target_fig_uri = fig_to_uri(target_fig)
             return target_fig_uri
         else:

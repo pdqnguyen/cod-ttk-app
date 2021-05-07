@@ -26,10 +26,11 @@ MODEL_HEIGHT_METERS = 1.8
 IM_SCALE = MODEL_HEIGHT_RATIO / MODEL_HEIGHT_METERS * HITBOX.shape[1]
 
 
-def get_aim_center(offset, hitbox=HITBOX):
+def get_aim_center(offset, hitbox=HITBOX, im_center=None):
     offset_x = int(offset[0] * IM_SCALE)
     offset_y = int(offset[1] * IM_SCALE)
-    im_center = (int(hitbox.shape[0] / 2), int(hitbox.shape[1] / 2))
+    if im_center is None:
+        im_center = (int(hitbox.shape[0] / 2), int(hitbox.shape[1] / 2))
     aim_x = im_center[0] + offset_x
     aim_y = im_center[1] + offset_y
     center = (aim_x, aim_y)
@@ -46,19 +47,19 @@ def generate_dmg_maps(profile, hitbox=HITBOX, hitbox_regions=HITBOX_REGIONS):
     return out
 
 
-def generate_target_map(shape, distance, aim_center, spread, gaussian=True, gaussian_scale=3.):
-    x_spread = spread[0] * (np.pi / 180.) * distance * IM_SCALE
-    y_spread = spread[1] * (np.pi / 180.) * distance * IM_SCALE
-    Y, X = np.meshgrid(range(shape[0]), range(shape[1]))
-    xa, xb = aim_center[0] - x_spread / 2, aim_center[0] + x_spread / 2
-    ya, yb = aim_center[1] - y_spread / 2, aim_center[1] + y_spread / 2
+def generate_target_map(shape, spread, gaussian=True, gaussian_scale=3.):
+    x0, x1, y0, y1 = spread
+    x_spread = x1 - x0
+    y_spread = y1 - y0
+    center = (x0 + x_spread / 2, y0 + y_spread / 2)
+    Y, X = np.meshgrid(range(shape[1]), range(shape[0]))
     if gaussian:
         x_sigma = x_spread / gaussian_scale
         y_sigma = y_spread / gaussian_scale
-        target_map = np.exp(-((X - aim_center[0]) / x_sigma) ** 2 - ((Y - aim_center[1]) / y_sigma) ** 2)
+        target_map = np.exp(-((X - center[0]) / x_sigma) ** 2 - ((Y - center[1]) / y_sigma) ** 2)
     else:
         target_map = np.zeros(shape, dtype=float)
-        target_map[(X > xa) & (X < xb) & (Y > ya) & (Y < yb)] = 1
+        target_map[(X > x0) & (X < x1) & (Y > y0) & (Y < y1)] = 1
     target_map /= target_map.sum()
     return target_map
 
@@ -77,6 +78,7 @@ def measure_stk_ttk(dpr, distance, wpn, ads=False):
 
 
 def analyze(weapons, distances, center, ads=False, hitbox=HITBOX, hitbox_regions=HITBOX_REGIONS):
+    center_pix = get_aim_center(center, hitbox=hitbox)
     num_distances = len(distances)
     dps = {wpn['gun']: np.zeros(num_distances) for wpn in weapons}
     stk = {wpn['gun']: np.zeros(num_distances) for wpn in weapons}
@@ -92,7 +94,7 @@ def analyze(weapons, distances, center, ads=False, hitbox=HITBOX, hitbox_regions
         edges.append(1e99)
         for i in range(len(edges) - 1):
             dmg_map = dmg_maps[i]
-            dpr_nr = dmg_map[center[0], center[1]]
+            dpr_nr = dmg_map[center_pix[0], center_pix[1]]
             if dpr_nr > 0:
                 a, b = edges[i: i + 2]
                 segment = (distances >= a) & (distances < b)
@@ -106,8 +108,13 @@ def analyze(weapons, distances, center, ads=False, hitbox=HITBOX, hitbox_regions
                 for j, distance in enumerate(distances_segment):
                     distance = distances_segment[j]
                     spread = wpn['spread']
-                    target_map = generate_target_map(dmg_map.shape, distance, center, spread)
-                    dpr = np.sum(dmg_map * target_map)
+                    x_spread = spread[0] * (np.pi / 180.) * distance * IM_SCALE
+                    y_spread = spread[1] * (np.pi / 180.) * distance * IM_SCALE
+                    x0, x1 = center_pix[0] - x_spread / 2, center_pix[0] + x_spread / 2
+                    y0, y1 = center_pix[1] - y_spread / 2, center_pix[1] + y_spread / 2
+                    dmg_map_new, center_pix_new, (x0, x1, y0, y1) = resize_hitbox(dmg_map, center, (x0, x1, y0, y1))
+                    target_map = generate_target_map(dmg_map_new.shape, (x0, x1, y0, y1))
+                    dpr = np.sum(dmg_map_new * target_map)
                     dps_segment[j], stk_segment[j], ttk_segment[j] = measure_stk_ttk(dpr, distance, wpn, ads=ads)
                     dps_nr_segment[j], stk_nr_segment[j], ttk_nr_segment[j] = measure_stk_ttk(dpr_nr, distance, wpn, ads=ads)
                 dps[gun][segment] = dps_segment
@@ -226,6 +233,28 @@ def tick_format(value):
         return '${0:.1f}$'.format(value)
 
 
+def resize_hitbox(hitbox, center, spreadbox):
+    x0, x1, y0, y1 = spreadbox
+    x_spread = x1 - x0
+    y_spread = y1 - y0
+    padding = (
+        (
+            max(0, int(np.ceil(-x0))),
+            max(0, int(np.ceil(x1 - hitbox.shape[0]))),
+        ),
+        (
+            max(0, int(np.ceil(-y0))),
+            max(0, int(np.ceil(y1 - hitbox.shape[1]))),
+        )
+    )
+    hitbox_new = np.pad(hitbox, padding)
+    im_center = (int(hitbox.shape[0] / 2) + padding[0][0], int(hitbox.shape[1] / 2) + padding[1][0])
+    center_pix_new = get_aim_center(center, hitbox=hitbox_new, im_center=im_center)
+    x0_new, x1_new = center_pix_new[0] - x_spread / 2, center_pix_new[0] + x_spread / 2
+    y0_new, y1_new = center_pix_new[1] - y_spread / 2, center_pix_new[1] + y_spread / 2
+    return hitbox_new, center_pix_new, (x0_new, x1_new, y0_new, y1_new)
+
+
 def plot_target_area(weapon_data, distance, center, zoom=1, fov=80, hitbox=HITBOX):
     fov_rad = fov * np.pi / 180.
     screen_width = 10
@@ -233,27 +262,33 @@ def plot_target_area(weapon_data, distance, center, zoom=1, fov=80, hitbox=HITBO
     spread = weapon_data['spread']
     x_spread = spread[0] * (np.pi / 180.) * distance * IM_SCALE
     y_spread = spread[1] * (np.pi / 180.) * distance * IM_SCALE
-    target_x0 = center[0] - x_spread / 2
-    target_y0 = center[1] - y_spread / 2
+    center_pix = get_aim_center(center, hitbox=hitbox)
+    x0, x1 = center_pix[0] - x_spread / 2, center_pix[0] + x_spread / 2
+    y0, y1 = center_pix[1] - y_spread / 2, center_pix[1] + y_spread / 2
+    hitbox, center_pix, (x0, x1, y0, y1) = resize_hitbox(hitbox, center, (x0, x1, y0, y1))
+    # print(hitbox.shape)
+    # print(x0, x1, y0, y1)
+    # if target_y0 + y_spread > hitbox.shape[1]:
+    #     np.pad(hitbox,
     # target_rect = patches.Rectangle((target_x0, target_y0), x_spread, y_spread,
     #                                 linewidth=1, linestyle=':', edgecolor='r', facecolor='none')
-    target_map = generate_target_map(hitbox.shape, distance, center, spread)
+    target_map = generate_target_map(hitbox.shape, (x0, x1, y0, y1))
     fig, ax = plt.subplots(1, 1, figsize=(screen_width, screen_width / screen_aspect))
     ax.set_position([0, 0, 1, 1])
     ax.imshow(hitbox.T, origin='lower', cmap='gray')
     ax.imshow(target_map.T, origin='lower', cmap='copper', alpha=0.8)
-    ax.plot([target_x0, target_x0 + x_spread], [center[1], center[1]], color='r')
-    ax.plot([center[0], center[0]], [target_y0, target_y0 + y_spread], color='r')
+    ax.plot([x0, x1], [center_pix[1], center_pix[1]], color='r')
+    ax.plot([center_pix[0], center_pix[0]], [y0, y1], color='r')
     # ax.plot(center[0], center[1], 'y+', ms=30)
     # ax.add_patch(target_rect)
     ax.set_aspect('equal')
     ax.set_xlim(
-        center[0] - 0.5 * fov_rad * distance * IM_SCALE / zoom,
-        center[0] + 0.5 * fov_rad * distance * IM_SCALE / zoom
+        center_pix[0] - 0.5 * fov_rad * distance * IM_SCALE / zoom,
+        center_pix[0] + 0.5 * fov_rad * distance * IM_SCALE / zoom
     )
     ax.set_ylim(
-        center[1] - 0.5 * fov_rad * distance * IM_SCALE / screen_aspect / zoom,
-        center[1] + 0.5 * fov_rad * distance * IM_SCALE / screen_aspect / zoom
+        center_pix[1] - 0.5 * fov_rad * distance * IM_SCALE / screen_aspect / zoom,
+        center_pix[1] + 0.5 * fov_rad * distance * IM_SCALE / screen_aspect / zoom
     )
     plt.axis('off')
     return fig
