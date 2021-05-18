@@ -23,6 +23,9 @@ MODEL_HEIGHT_PIXELS = 404   # pixel height of HITBOX
 MODEL_HEIGHT_METERS = 1.8   # estimated physical height, about 6 ft
 IM_SCALE = MODEL_HEIGHT_PIXELS / MODEL_HEIGHT_METERS
 
+# Target hp for TTK/STK calculation
+DEFAULT_TARGET_HP = 250.0
+
 
 def get_aim_center(offset, target=TARGET, im_center=None):
     offset_x = int(offset[0] * IM_SCALE)
@@ -101,14 +104,19 @@ def resize_target(target, center_pix, beam_box):
     return target_new, center_pix_new, beam_box_new
 
 
-def apply_damage(dpr, distance, wpn, ads=False):
-    hp = 250.0
-    stk = int(np.ceil(hp / dpr))
+def apply_damage(dpr, distance, wpn, ads=False, hp=DEFAULT_TARGET_HP, free_hit=0):
     rps = wpn['fire_rate'] / 60.
+    if free_hit > 0:
+        hp -= free_hit
+        stk = int(np.ceil(hp / dpr)) + 1
+    else:
+        stk = int(np.ceil(hp / dpr))
     dps = dpr * rps
     t_travel = distance / wpn['bullet_velocity']
     t_reload = wpn['reload_time'] * int((stk - 1) / wpn['mag_size'])
     ttk = hp / dps + t_travel + t_reload
+    if free_hit > 0:
+        ttk += 1. / rps
     if ads:
         ttk += wpn['ads'] / 1000.
     return dps, stk, ttk
@@ -153,7 +161,7 @@ def analyze(weapons, distances, center, ads=False, target=TARGET, target_regions
                     target_dmg_new, _, beam_box_new = resize_target(target_dmg, center_pix, beam_box)
                     beam_profile = create_beam_profile(target_dmg_new.shape, beam_box_new)
                     dpr = np.sum(target_dmg_new * beam_profile)
-                    results = apply_damage(dpr, distance, wpn, ads=ads)
+                    results = apply_damage(dpr, distance, wpn, ads=ads, free_hit=dpr_nr)
                     results_nr = apply_damage(dpr_nr, distance, wpn, ads=ads)
                     dps_segment[j], stk_segment[j], ttk_segment[j] = results
                     dps_nr_segment[j], stk_nr_segment[j], ttk_nr_segment[j] = results_nr
