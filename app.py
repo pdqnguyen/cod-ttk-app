@@ -705,7 +705,7 @@ def update_image(aim_center_select, dist, zoom, fov, wpn_idx, *spreads_and_data)
             if wpn_idx is None:
                 return ""
             data, spreads = add_spreads(data, *spreads)
-            target_fig = utils.plot_target_area(data[wpn_idx], dist, AIM_CENTER_DICT[aim_center_select], zoom=zoom, fov=fov)
+            target_fig = utils.plot_beam_profile(data[wpn_idx], dist, AIM_CENTER_DICT[aim_center_select], zoom=zoom, fov=fov)
             target_fig_uri = fig_to_uri(target_fig)
             return target_fig_uri
         else:
