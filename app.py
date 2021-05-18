@@ -29,8 +29,8 @@ DEFAULT_FOV = 80
 
 # Offset from image center in meters (horizontal, vertical)
 AIM_CENTER_DICT = {
-    # 'stomach': (0.07, 0.07),
-    'stomach/chest': (0.03, 0.28),
+    'stomach': (0.07, 0.07),
+    # 'stomach/chest': (0.03, 0.28),
     'chest': (0.0, 0.45),
     'head': (-0.07, 0.72),
 }
