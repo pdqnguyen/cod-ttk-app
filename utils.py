@@ -18,12 +18,10 @@ HITBOX_REGIONS = {'head': 255, 'chest': 207, 'stomach': 126, 'extremities': 71, 
 # Load hit-box array and transpose it so that rows -> X values and columns -> Y values
 HITBOX = np.load(DEFAULT_HITBOX_FILEPATH)[::-1].T
 
-# Model height scale is the ratio of the model height in the image, as a percentage of image height,
-# to the physical model height in meters. The hitbox used by default has a height about 85% of the
-# image height and estimated 1.8m ~ 6ft physical height.
-MODEL_HEIGHT_RATIO = 0.85
-MODEL_HEIGHT_METERS = 1.8
-IM_SCALE = MODEL_HEIGHT_RATIO / MODEL_HEIGHT_METERS * HITBOX.shape[1]
+# Conversion factor for going between pixels and meters in target frame.
+MODEL_HEIGHT_PIXELS = 404   # pixel height of HITBOX
+MODEL_HEIGHT_METERS = 1.8   # estimated physical height, about 6 ft
+IM_SCALE = MODEL_HEIGHT_PIXELS / MODEL_HEIGHT_METERS
 
 
 def get_aim_center(offset, hitbox=HITBOX, im_center=None):
