@@ -1,143 +1,109 @@
 [
   {
-    "gun": "Kilo 141",
-    "fire_rate": 751,
-    "range_modifier": 0.595,
-    "ads": 409,
+    "gun": "C58",
+    "fire_rate": 553,
+    "range_modifier": 0.4850000000000003,
+    "ads": 359,
     "sprint_to_fire": 263,
     "tactical_sprint_to_fire": 392,
-    "bullet_velocity": 1299.9599999999998,
-    "reload_time": 2.36,
-    "mag_size": 60,
+    "bullet_velocity": 1192.5,
+    "reload_time": 2,
+    "mag_size": 25,
     "damage_profile": [
       {
-        "head": 42,
-        "chest": 28,
-        "stomach": 28,
-        "extremities": 28,
+        "head": 59,
+        "chest": 44,
+        "stomach": 40,
+        "extremities": 37,
         "dropoff": 0.0
       },
       {
-        "head": 34,
-        "chest": 23,
-        "stomach": 23,
-        "extremities": 23,
-        "dropoff": 48.6475
-      },
-      {
-        "head": 27,
-        "chest": 18,
-        "stomach": 18,
-        "extremities": 18,
-        "dropoff": 86.9275
+        "head": 55,
+        "chest": 40,
+        "stomach": 37,
+        "extremities": 34,
+        "dropoff": 37.12500000000001
       }
     ]
   },
   {
-    "gun": "CR-56 AMAX",
-    "fire_rate": 630,
-    "range_modifier": 0.4520000000000002,
-    "ads": 444,
+    "gun": "FARA",
+    "fire_rate": 790,
+    "range_modifier": 0.4850000000000003,
+    "ads": 369,
     "sprint_to_fire": 263,
     "tactical_sprint_to_fire": 392,
-    "bullet_velocity": 958.5709999999999,
-    "reload_time": 2.25,
-    "mag_size": 45,
-    "damage_profile": [
-      {
-        "head": 56,
-        "chest": 42,
-        "stomach": 35,
-        "extremities": 35,
-        "dropoff": 0.0
-      },
-      {
-        "head": 51,
-        "chest": 38,
-        "stomach": 32,
-        "extremities": 32,
-        "dropoff": 34.848000000000006
-      }
-    ]
-  },
-  {
-    "gun": "FFAR",
-    "fire_rate": 900,
-    "range_modifier": 0.32000000000000006,
-    "ads": 399,
-    "sprint_to_fire": 179,
-    "tactical_sprint_to_fire": 275,
-    "bullet_velocity": 879.2,
-    "reload_time": 2.48,
-    "mag_size": 50,
-    "damage_profile": [
-      {
-        "head": 40,
-        "chest": 27,
-        "stomach": 27,
-        "extremities": 27,
-        "dropoff": 0.0
-      },
-      {
-        "head": 37,
-        "chest": 25,
-        "stomach": 25,
-        "extremities": 25,
-        "dropoff": 40.92
-      }
-    ]
-  },
-  {
-    "gun": "Grau 5.56",
-    "fire_rate": 730,
-    "range_modifier": 0.54,
-    "ads": 364,
-    "sprint_to_fire": 263,
-    "tactical_sprint_to_fire": 392,
-    "bullet_velocity": 1299.9599999999998,
-    "reload_time": 2.15,
-    "mag_size": 60,
-    "damage_profile": [
-      {
-        "head": 42,
-        "chest": 28,
-        "stomach": 28,
-        "extremities": 28,
-        "dropoff": 0.0
-      },
-      {
-        "head": 33,
-        "chest": 22,
-        "stomach": 22,
-        "extremities": 22,
-        "dropoff": 47.74
-      }
-    ]
-  },
-  {
-    "gun": "AS VAL",
-    "fire_rate": 885,
-    "range_modifier": 0.26,
-    "ads": 307,
-    "sprint_to_fire": 263,
-    "tactical_sprint_to_fire": 392,
-    "bullet_velocity": 429.57,
-    "reload_time": 2.4000000000000004,
+    "bullet_velocity": 1125,
+    "reload_time": 3.17,
     "mag_size": 30,
     "damage_profile": [
       {
-        "head": 47,
-        "chest": 37,
-        "stomach": 30,
+        "head": 40,
+        "chest": 31,
+        "stomach": 31,
+        "extremities": 31,
+        "dropoff": 0.0
+      },
+      {
+        "head": 35,
+        "chest": 26,
+        "stomach": 26,
+        "extremities": 26,
+        "dropoff": 40.095000000000006
+      }
+    ]
+  },
+  {
+    "gun": "Krig 6",
+    "fire_rate": 652,
+    "range_modifier": 0.4850000000000003,
+    "ads": 342,
+    "sprint_to_fire": 263,
+    "tactical_sprint_to_fire": 392,
+    "bullet_velocity": 1136.25,
+    "reload_time": 0.1,
+    "mag_size": 30,
+    "damage_profile": [
+      {
+        "head": 45,
+        "chest": 33,
+        "stomach": 33,
         "extremities": 30,
         "dropoff": 0.0
       },
       {
-        "head": 36,
+        "head": 38,
         "chest": 28,
-        "stomach": 23,
-        "extremities": 23,
-        "dropoff": 40.32
+        "stomach": 28,
+        "extremities": 25,
+        "dropoff": 56.430000000000014
+      }
+    ]
+  },
+  {
+    "gun": "XM4",
+    "fire_rate": 721,
+    "range_modifier": 0.4850000000000003,
+    "ads": 305,
+    "sprint_to_fire": 263,
+    "tactical_sprint_to_fire": 392,
+    "bullet_velocity": 1153.125,
+    "reload_time": 2.36,
+    "mag_size": 30,
+    "damage_profile": [
+      {
+        "head": 48,
+        "chest": 32,
+        "stomach": 32,
+        "extremities": 32,
+        "dropoff": 0.0
+      },
+      {
+        "head": 42,
+        "chest": 28,
+        "stomach": 28,
+        "extremities": 28,
+        "dropoff": 32.67000000000001
       }
     ]
   }
