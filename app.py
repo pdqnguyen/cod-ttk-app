@@ -40,8 +40,11 @@ AIM_CENTER_DICT = {
 with open('example.json', 'r') as f:
     EXAMPLE_DATA = json.load(f)
 
-with open('markdown/about.md', 'r') as f:
-    ABOUT_TEXT = f.read()
+with open('markdown/about1.md', 'r') as f:
+    ABOUT_TEXT1 = f.read()
+
+with open('markdown/about2.md', 'r') as f:
+    ABOUT_TEXT2 = f.read()
 
 with open('markdown/fetch-help.md', 'r') as f:
     FETCH_TEXT = f.read()
@@ -254,7 +257,21 @@ app.layout = html.Div(
         dbc.Modal(
             [
                 dbc.ModalHeader("What is this?"),
-                dbc.ModalBody(dcc.Markdown(ABOUT_TEXT)),
+                dbc.ModalBody(
+                    html.Div([
+                        dcc.Markdown(ABOUT_TEXT1),
+                        html.Div([
+                            html.Video(
+                                controls=True,
+                                id='movie_player',
+                                src="/assets/videos/example.mp4",
+                                autoPlay=False,
+                                width='100%',
+                            ),
+                        ], style={'margin-top': 20, 'margin-bottom': 20}),
+                        dcc.Markdown(ABOUT_TEXT2),
+                    ])
+                ),
                 dbc.ModalFooter(
                     dbc.Button("Close", id="about-close", className="ml-auto")
                 ),

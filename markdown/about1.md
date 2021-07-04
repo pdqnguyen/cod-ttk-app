@@ -22,12 +22,12 @@ leverage the higher damage output of certain weapons, while weapons with low dam
 output require much less recoil control.
 
 ### Recoil
-Recoil is the angular displacement in a player's crosshair after firing a round
+Recoil is the displacement of a player's crosshair after firing a round
 of ammunition.
-In Warzone, during sustained fully-automatic fire, the magnitude and direction
+In Warzone, during sustained automatic fire, the magnitude and direction
 of the displacement after each round is dependent on the number of rounds fired so far.
 This time-dependence results in a "recoil pattern" that can be learned by players
-to maximize their accuracy.
+to improve their accuracy.
 Each displacement also has a (typically small) random component added to it in order
 to provide some randomness to the recoil pattern.
 This "jitter" effectively caps how well a player can use a weapon, since the jitter
@@ -36,13 +36,15 @@ for random deviations from the target.
 
 All of these traits make it impractical to quantify the effect of a weapon's recoil
 pattern on its accuracy.
-One simple approach is to just measure the horizontal and vertical extent of the
+One naive approach is to simply measure the horizontal and vertical extent of the
 recoil pattern and use these to rank weapons against one another.
-However, this would fail to capture the nuances of the time-dependence, as well as
+This fails to capture the nuances of the time-dependence, as well as
 the magnitude of the jitter effects, both of which are arguable equally if not more
 important than the maximum displacements.
-Even more nuanced metrics would still fail to capture how well a human player
-would be able to control a recoil pattern.
+Even more nuanced metrics for quantifying the recoil pattern morphology may still
+fail to capture how well a human player would be able to control the recoil.
+
+### Recoil-adjusted damage calculator
 
 The recoil-adjusted damage calculator takes an empirical approach to evaluating weapon
 recoil: it uses measurements of a human player's accuracy with each weapon to
@@ -63,6 +65,7 @@ The validity of this assumption has yet to be tested, but since a player can lea
 how to counter-act the time-dependent component of a recoil pattern after some
 practice, the impact distribution is likely dominated by the jitter contribution,
 at least for more experienced players.
+Since the jitter is 
 In reality, some weapons can have "kinks" in their recoil patterns that are difficult to
 control, even for experts, which can introduce outliers to the bullet spread,
 shifting it away from a normal distribution.
@@ -113,16 +116,6 @@ TrueGameData) is added onto the TTK to simulate the time spent to reload in the
 middle of an engagement (typically this only occurs for very inaccurate
 players or weapons, or when aiming at very distant or small targets).
 
-### Examples
+### Example
 
-Measurements in a Google spreadsheet
-
-![spreadsheet](../images/spreadsheet.PNG)
-
-### Future work
-Here are some things that *may* be implemented in the future.
-- [ ]  Segment plot: horizontal bar showing dominant weapon at each distance bin.
-- [ ]  Better hitbox geometry, or average over various hitboxes representing different encounter angles.
-- [ ]  Add a slider for enemy HP.
-- [ ]  Add option of including/excluding reload time.
-- [ ]  Show percentage of shots hitting each hitbox region (e.g. 10% head, 25% chest, etc.).
+**Below is a video showing an example recoil test from which measurements can be taken.**
