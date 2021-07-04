@@ -15,7 +15,7 @@ from truegamedata import get_weapons_data
 
 # Default app properties
 
-APP_TITLE = "Call of Duty weapon performance tool"
+APP_TITLE = "COD Warzone Recoil-Adjusted Damage Calculator"
 
 
 # Default parameters
@@ -332,13 +332,13 @@ app.layout = html.Div(
                 html.Div(
                     [
                         html.Div([
-                            html.Center("Aim center"),
+                            html.Center("Crosshair location"),
                             dbc.RadioItems(
                                 id='radio-aim-center',
                                 options=[{'label': k, 'value': k} for k in AIM_CENTER_DICT.keys()],
-                                value=list(AIM_CENTER_DICT.keys())[0],
+                                value='chest',
                                 inline=True,
-                                style={'margin-left': 20, 'display': 'inline-block', 'textAlign': 'center'},
+                                style={'margin-left': 20, 'margin-bottom': 10, 'display': 'inline-block', 'textAlign': 'center'},
                             )
                         ], style={'width': '90%'}),
                         html.Div([
@@ -354,7 +354,7 @@ app.layout = html.Div(
                                 id='radio-plot-ads',
                                 options=[{'label': 'Yes', 'value': 'yes'},
                                          {'label': 'No', 'value': 'no'}],
-                                value='yes',
+                                value='no',
                                 inline=True,
                                 style={'margin-left': 20, 'display': 'inline-block'},
                             )
@@ -440,7 +440,7 @@ app.layout = html.Div(
 
         # RECOIL SPREAD IMAGE SECTION
         dbc.Card([
-            dbc.CardHeader("Recoil area viewer", style={'font-size': 24, 'textAlign': 'center'}),
+            dbc.CardHeader("Bullet distribution", style={'font-size': 24, 'textAlign': 'center'}),
             dbc.CardBody([
                 dbc.Row([
                     dbc.Col(

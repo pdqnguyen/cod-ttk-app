@@ -2,34 +2,127 @@ This tool allows you to estimate the damage output of Call Of Duty weapons based
 ability to recoil control.
 
 ### Motivation
-Recoil matters!
+Warzone players typically compare the viability of different weapons by comparing
+their time-to-kill (TTK).
+A weapon's TTK is determined from its damage output
+(measured as damage-per-second, or DPS) and the health of a typical enemy player.
+Other factors, such as aim-down-sight time and bullet velocity, can be counted
+towards TTK to give a more realistic illustration of the weapon's effectiveness in-game.
+However, recoil is often treated as an independent weapon characteristic
+that is evaluated only qualitatively.
+Recoil reduces a player's accuracy when firing automatic weapons at range,
+in turn reducing the weapons' damage output.
+This reduction scales with the size of the target from the shooter's perspective
+(either due to distance or obstruction), as well as the magnitude and shape of the
+recoil pattern.
+For game balance, developers typically design weapons such that damage and
+recoil are roughly correlated.
+This way, a higher skill level may be required to
+leverage the higher damage output of certain weapons, while weapons with low damage
+output require much less recoil control.
+
+### Recoil
+Recoil is the angular displacement in a player's crosshair after firing a round
+of ammunition.
+In Warzone, during sustained fully-automatic fire, the magnitude and direction
+of the displacement after each round is dependent on the number of rounds fired so far.
+This time-dependence results in a "recoil pattern" that can be learned by players
+to maximize their accuracy.
+Each displacement also has a (typically small) random component added to it in order
+to provide some randomness to the recoil pattern.
+This "jitter" effectively caps how well a player can use a weapon, since the jitter
+displacements are not predictable, but still incentivizes quick reactions to correct
+for random deviations from the target.
+
+All of these traits make it impractical to quantify the effect of a weapon's recoil
+pattern on its accuracy.
+One simple approach is to just measure the horizontal and vertical extent of the
+recoil pattern and use these to rank weapons against one another.
+However, this would fail to capture the nuances of the time-dependence, as well as
+the magnitude of the jitter effects, both of which are arguable equally if not more
+important than the maximum displacements.
+Even more nuanced metrics would still fail to capture how well a human player
+would be able to control a recoil pattern.
+
+The recoil-adjusted damage calculator takes an empirical approach to evaluating weapon
+recoil: it uses measurements of a human player's accuracy with each weapon to
+compute the TTK they would expect to achieve if they were to match that accuracy
+when using that weapon in combat.
+A player measures their accuracy by firing as accurately as possible at a fixed
+target such as a spot on a wall, producing a distribution of bullet impacts on the
+wall, and measuring the horizontal and vertical widths of the distribution.
+The widths are used to generate a probability distribution of bullet
+impacts that can be superimposed on a hypothetical target to compute the expected
+damage output rate.
+This can be computed for many target sizes to simulate different engagement distances,
+yielding an estimate of damage output as a function of target distance.
+
+This assumes that the impact spread approaches some distribution over time.
+For simplicity, a two-dimensional normal distribution is assumed.
+The validity of this assumption has yet to be tested, but since a player can learn
+how to counter-act the time-dependent component of a recoil pattern after some
+practice, the impact distribution is likely dominated by the jitter contribution,
+at least for more experienced players.
+In reality, some weapons can have "kinks" in their recoil patterns that are difficult to
+control, even for experts, which can introduce outliers to the bullet spread,
+shifting it away from a normal distribution.
+The simulated distribution is generated with a standard deviation equal to one-third
+of the observed distribution, i.e. it is assumed that the widths measured by the
+player cover 99.7% of impacts (this leaves some wiggle room for excluding
+extreme outliers about once every few hundred rounds).
 
 ### Methodology
-1. Acquire weapon data from True Game Data
-1. Recoil spread for each weapon
-1. Sample overlap of recoil spread with enemy hitbox over many distance bins to compute TTK
+The weapon specifications, e.g. damage and fire rate, are extracted from
+[TrueGameData](https://truegamedata.com/).
+**This means that the results here are
+partly limited by how up-to-date and accurate the specs on TrueGameData are!**
+To measure a player's effective damage output with a weapon, the player must do the
+following:
 
-### Usage
-1. Use TGD to design loadouts
-1. Measure your recoil spread
-1. Interpreting the TTK chart
-1. Recoil spread viewer
+1. Produce a weapon comparison page on TrueGameData for up to five weapons.
+   [Click here](https://www.truegamedata.com/?share=bTECUV) for an example.
+1. Enter a private match, training mode, or a plunder mode with one of their loadouts.
+1. Choose a target on a wall on which bullet impacts would be highly visible.
+1. Fire a full magazine at the target, controlling recoil to the best of their ability.
+1. Measure the horizontal and vertical widths of the impact spread on-screen.
+1. Convert the on-screen widths to in-game, angular widths (in degrees).
+1. To minimize statistical uncertainty, it is best for the player to do a few trials and
+use an average angular width.
+1. Repeat the measurement steps for each weapon.
 
-### Limitations
-- Hitbox realism - angles and cover
-- Measurement uncertainty - how many trials? 5?
-- Shot distribution - uniform vs other
-- TGD data
+The angular widths are used to produce a probability distribution for each weapon.
+These distributions can be visualized using the "Bullet distribution" viewer.
+For each weapon, a simulated target map is produced, with values equal to the
+damage value of the weapon when hitting each part of the body&mdash;head, chest,
+stomach, and extremities.
+The target is scaled to simulate engagements over a range of distances (nominally
+1-100 meters).
+The player can choose where to center the distribution, in order to compare their
+recoil-adjusted damage output when aiming at the chest to that at the head,
+for instance.
+
+At each distance, the damage per round is computed by multiplying the probability
+distribution by the target map and summing the damage contributions.
+This is converted to the damage-per-second (DPS), shots-to-kill (STK), and
+time-to-kill (TTK) based on target hit points, bullet velocity, and (optionally)
+aim-down-sight (ADS) time.
+The first round is "free", i.e. it takes on the damage value wherever the distribution
+is centered, since recoil does not affect the first round.
+If STK exceeds magazine size, the reload time of the weapon (also extracted from
+TrueGameData) is added onto the TTK to simulate the time spent to reload in the
+middle of an engagement (typically this only occurs for very inaccurate
+players or weapons, or when aiming at very distant or small targets).
+
+### Examples
+
+Measurements in a Google spreadsheet
+
+![spreadsheet](../images/spreadsheet.PNG)
 
 ### Future work
-This is more or less a reminder for myself about things to implement.
-- [ ] Segment plot: horizontal bar showing dominant weapon at each distance bin.
-- [ ] Better hitbox geometry, or average over various hitboxes representing different encounter angles.
-- [x] More advanced shot distribution. Tapered uniform distribution? Fit a distribution to actual recoil spreads?
-- [x] Add reload time whenever magazine capacity is reached.
-- [ ] Add a slider for enemy HP.
-- [ ] Add option of including/excluding reload time.
-- [ ] Show percentage of shots hitting each hitbox region (e.g. 10% head, 25% chest, etc.).
-- [ ] Related to the above, an alternative input option of inputting damage distribution at select distances,
-  and interpolating to approximate performance curves. Although easier, this would give likely give less
-  accurate results
+Here are some things that *may* be implemented in the future.
+- [ ]  Segment plot: horizontal bar showing dominant weapon at each distance bin.
+- [ ]  Better hitbox geometry, or average over various hitboxes representing different encounter angles.
+- [ ]  Add a slider for enemy HP.
+- [ ]  Add option of including/excluding reload time.
+- [ ]  Show percentage of shots hitting each hitbox region (e.g. 10% head, 25% chest, etc.).
