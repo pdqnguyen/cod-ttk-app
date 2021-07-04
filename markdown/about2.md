@@ -32,6 +32,16 @@ beats the XM4 at 30-55 meters.
 
 ![TTK](/assets/images/example/chest/ttk_no_ads_no_recoil.png)
 
+Below are DPS graphs for headshots (with zero-recoil curves shown as well) and
+chest shots. These show that it may be (at least based on my recoil measurements)
+impractical aiming for headshots beyond about 30 meters. Even for the laser-accurate
+FARA, headshot DPS drops below chest DPS at 30 meters. This really emphasizes how
+important chest multipliers can be (often being far more important that head damage
+multipliers, as was the case with the CR-56 AMAX before its multiple nerfs).
+
+![DPS_head](/assets/images/example/head/dps.png)
+![DPS_chest](/assets/images/example/chest/dps.png)
+
 
 ### Future work
 Here are some things that *may* be implemented in the future.
