@@ -11,16 +11,16 @@
     "mag_size": 25,
     "damage_profile": [
       {
-        "head": 59,
-        "chest": 44,
-        "stomach": 40,
+        "head": 58,
+        "chest": 37,
+        "stomach": 37,
         "extremities": 37,
         "dropoff": 0.0
       },
       {
-        "head": 55,
-        "chest": 40,
-        "stomach": 37,
+        "head": 53,
+        "chest": 34,
+        "stomach": 34,
         "extremities": 34,
         "dropoff": 37.12500000000001
       }
@@ -38,10 +38,10 @@
     "mag_size": 30,
     "damage_profile": [
       {
-        "head": 40,
-        "chest": 31,
-        "stomach": 31,
-        "extremities": 31,
+        "head": 37,
+        "chest": 29,
+        "stomach": 29,
+        "extremities": 29,
         "dropoff": 0.0
       },
       {
@@ -72,10 +72,10 @@
         "dropoff": 0.0
       },
       {
-        "head": 38,
+        "head": 39,
         "chest": 28,
         "stomach": 28,
-        "extremities": 25,
+        "extremities": 26,
         "dropoff": 56.430000000000014
       }
     ]
@@ -92,17 +92,17 @@
     "mag_size": 30,
     "damage_profile": [
       {
-        "head": 48,
-        "chest": 32,
-        "stomach": 32,
-        "extremities": 32,
+        "head": 45,
+        "chest": 30,
+        "stomach": 30,
+        "extremities": 30,
         "dropoff": 0.0
       },
       {
-        "head": 42,
-        "chest": 28,
-        "stomach": 28,
-        "extremities": 28,
+        "head": 41,
+        "chest": 27,
+        "stomach": 27,
+        "extremities": 27,
         "dropoff": 32.67000000000001
       }
     ]

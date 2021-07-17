@@ -43,7 +43,7 @@ def get_weapons_data(link):
             gun_name = gun
         stats = wpn['summaryStats']
         fire_rate, range_modifier, ads, sprint_to_fire, tactical_sprint_to_fire = stats[:5]
-        bullet_velocity, reload_time, mag_size = stats[10:]
+        bullet_velocity, reload_time, mag_size = stats[10:13]
         damage_profile = get_damage_profile(gun, mode)
         for d in damage_profile:
             d['dropoff'] = d['dropoff'] * (1 + range_modifier)
