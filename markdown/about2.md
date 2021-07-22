@@ -21,26 +21,34 @@ The first graph shows chest TTK up to 100 meters, with zero-recoil curves shown
 in dashed lines for comparison.
 See the corresponding [TrueGameData page](https://www.truegamedata.com/?share=bTECUV)
 for the full loadout specs.
-Adjusting for recoil results in a much greater TTK for many of these weapons,
-exceeding one second beyond ranges of about 60 meters.
-The C58, which is the strongest of these weapons based on damage alone, has a slower
-TTK than the much more accurate FARA beyond about 40 meters due to its recoil, but
-it still outpaces the XM4 at all ranges.
-The Krig 6 is often lauded for its incredibly low recoil, but given its very low
-damage output it still cannot compete with the C58 and FARA, and it only slightly
-beats the XM4 at 30-55 meters.
+Adjusting for recoil results in a much greater simulated TTK for many of these weapons
+relative to their theoretical TTK.
+The FARA, despite having the lowest long-range TTK on paper, does noticeably worse
+than the weaker Krig 6 due to its higher recoil.
 
-![TTK](/assets/images/example/chest/ttk_no_ads_no_recoil.png)
+![TTK](/assets/images/example/chest/ttk_nr.png)
 
-Below are DPS graphs for headshots (with zero-recoil curves shown as well) and
-chest shots. These show that it may be (at least based on my recoil measurements)
-impractical aiming for headshots beyond about 30 meters. Even for the laser-accurate
-FARA, headshot DPS drops below chest DPS at 30 meters. This really emphasizes how
-important chest multipliers can be (often being far more important that head damage
-multipliers, as was the case with the CR-56 AMAX before its multiple nerfs).
+Below are headshot TTKs (with zero-recoil curves shown as well).
+These show that, at least based on my recoil measurements,
+headshots can give a huge advantage to certain weapons with high headshot
+multipliers like the M13 if a player is close enough to take advantage of them.
+However, the practicality of aiming for headshots plummets quickly with distance.
+The M13 can manage a better headshot TTK than its chest TTK up to about 40 meters,
+whereas on the other extreme, weapons with very high recoil and/or low headshot
+multipliers such as the FARA are virtually incapable of benefiting from headshots
+except at close ranges, at which point SMGs would triumph anyway.
 
-![DPS_head](/assets/images/example/head/dps.png)
-![DPS_chest](/assets/images/example/chest/dps.png)
+![TTK_head](/assets/images/example/head/ttk_nr.png)
+
+Below, ADS times are added to the TTKs, showing that ADS speed can still
+contribute significantly even at ranges where TTK is dominated by recoil effects.
+
+![TTK_ads](/assets/images/example/chest/ttk_ads.png)
+
+From the above comparisons it seems clear that the Krig 6 is the dominant weapon when
+firing at the chest at long range, but the Kilo 141 and M13 have the potential to outperform
+the Krig 6 when taking headshots at medium to close ranges, or in encounters where
+a player needs to ADS as quickly as possible in response to immediate threats.
 
 
 ### Future work

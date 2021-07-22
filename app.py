@@ -15,7 +15,7 @@ from truegamedata import get_weapons_data
 
 # Default app properties
 
-APP_TITLE = "COD Warzone Recoil-Adjusted Damage Calculator"
+APP_TITLE = "COD Warzone Recoil-Adjusted Damage Simulator"
 
 
 # Default parameters
@@ -119,7 +119,7 @@ def make_recoil_slider_col(dim, num, width):
         max=2.51,
         step=0.05,
         value=1.0,
-        mark_values=[1, 2],
+        mark_values=[0.05, 1, 2],
         mark_fmt="{:.2f}°",
         width=width
     )
@@ -155,11 +155,11 @@ def make_target_distance_slider_col(width):
     """
     col = make_slider_col(
         text='target-distance-input',
-        min=10,
-        max=100,
+        min=50,
+        max=150,
         step=10,
         value=DEFAULT_TARGET_DISTANCE,
-        mark_values=[10, 50, 100],
+        mark_values=[50, 100, 150],
         mark_fmt="{:.0f}m",
         width=width
     )
@@ -220,7 +220,7 @@ def make_recoil_divs(rows):
             dbc.Col(html.Div(["1.00°"], id=f"spread-x-div-{i}"), width=1),
             make_recoil_slider_col('y', i, width=5),
             dbc.Col(html.Div(["1.00°"], id=f"spread-y-div-{i}"), width=1),
-        ])
+        ], no_gutters=True)
         out.append(row)
     return out
 
@@ -237,6 +237,96 @@ def make_weapon_name_divs(rows):
         row = html.Div(id=f"weapon-name-{i}", style={'height': '50px'})
         out.append(row)
     return out
+
+
+def make_recoil_card(max_weapons=MAX_WEAPONS):
+    header = "Step 2: Recoil spread (degrees)"
+    body = dbc.Row([
+        dbc.Col(
+            html.Div(
+                [
+                    dbc.Button(
+                        "Show help",
+                        id='howto-button',
+                        size='sm',
+                        style={'margin-bottom': 20, 'display': 'inline-block'}
+                    )
+                ] + make_weapon_name_divs(max_weapons)
+            ),
+            width=2, style={'textAlign': 'center'}
+        ),
+        dbc.Col(
+            html.Div(
+                [
+                    dbc.Row([
+                        dbc.Col(["Horizontal"], width=5),
+                        dbc.Col([], width=1),
+                        dbc.Col(["Vertical"], width=5),
+                        dbc.Col([], width=1),
+                    ], style={'margin-bottom': 25, 'textAlign': 'center'})
+                ] + make_recoil_divs(max_weapons)
+            ), width=10
+        ),
+    ])
+    card = dbc.Card([
+        dbc.CardHeader(header),
+        dbc.CardBody(body)
+    ])
+    return card
+
+
+def make_params_card():
+    header = "Step 3: Plot parameters"
+    body = html.Div([
+        html.Div([
+            html.Center("Crosshair location"),
+            dbc.RadioItems(
+                id='radio-aim-center',
+                options=[{'label': k, 'value': k} for k in AIM_CENTER_DICT.keys()],
+                value='chest',
+                inline=True,
+                style={'margin-left': 20, 'margin-bottom': 10, 'display': 'inline-block', 'textAlign': 'center'},
+            )
+        ], style={'width': '90%'}),
+        html.Div([
+            html.Center("Max distance (meters)"),
+            dbc.Row([
+                make_distance_slider_col(width=9),
+                dbc.Col(html.Div(id=f"distance-div"), width=3)
+            ])
+        ]),
+        html.Div([
+            html.Div("Add ADS to TTK:", style={'display': 'inline-block'}),
+            dbc.RadioItems(
+                id='radio-plot-ads',
+                options=[{'label': 'Yes', 'value': 'yes'},
+                         {'label': 'No', 'value': 'no'}],
+                value='no',
+                inline=True,
+                style={'margin-left': 20, 'display': 'inline-block'},
+            )
+        ]),
+        html.Div([
+            html.Div("Plot mode:", style={'display': 'inline-block'}),
+            dbc.RadioItems(
+                id='radio-plot-mode',
+                options=[{'label': 'TTK', 'value': 'ttk'},
+                         {'label': 'STK', 'value': 'stk'},
+                         {'label': 'DPS', 'value': 'dps'}],
+                value='ttk',
+                inline=True,
+                style={'margin-left': 20, 'display': 'inline-block'},
+            )
+        ], style={'margin-top': 5}),
+        html.Br(),
+        dbc.Button('Generate performance plot', id='plot-button', block=True),
+        html.Div("", id='perf-plot-err', style={'textAlign': 'center', 'margin-top': 5}),
+    ])
+    card = dbc.Card([
+        dbc.CardHeader(header),
+        dbc.CardBody(body)
+    ])
+    return card
 
 
 # BEGIN BUILDING THE APP
@@ -284,7 +374,7 @@ app.layout = html.Div(
 
         # LINK INPUT SECTION
         dbc.Card([
-            dbc.CardHeader("Data entry", style={'font-size': 24, 'textAlign': 'center'}),
+            dbc.CardHeader("Step 1: Data Import"),
             dbc.CardBody([
                 html.Div([
                     html.P("Link to TrueGameData comparison page:",
@@ -310,7 +400,7 @@ app.layout = html.Div(
         html.Br(),
 
 
-        # RECOIL MEASUREMENTS SECTION
+        # USER INPUTS SECTION
         dbc.Modal(
             [
                 dbc.ModalHeader("Measuring your recoil spread"),
@@ -325,75 +415,8 @@ app.layout = html.Div(
             size='lg',
         ),
         dbc.Row([
-            dbc.Col(html.Div([html.Br(), html.Br()] + make_weapon_name_divs(MAX_WEAPONS)),
-                    width=2, style={'textAlign': 'center'}),
-            dbc.Col(
-                html.Div(
-                    [
-                        html.Center([
-                            "Recoil spread (degrees)",
-                            dbc.Button("Show help", id='howto-button', size='sm',
-                                       style={'margin-left': 20, 'display': 'inline-block'})
-                        ]),
-                        dbc.Row([
-                            dbc.Col([html.Div("Horizontal", style={'textAlign': 'center'})], width=5),
-                            dbc.Col([], width=1),
-                            dbc.Col([html.Div("Vertical", style={'textAlign': 'center'})], width=5),
-                            dbc.Col([], width=1),
-                        ])
-                    ] + make_recoil_divs(MAX_WEAPONS)
-                ), width=5
-            ),
-            dbc.Col(width=1),
-            dbc.Col(
-                html.Div(
-                    [
-                        html.Div([
-                            html.Center("Crosshair location"),
-                            dbc.RadioItems(
-                                id='radio-aim-center',
-                                options=[{'label': k, 'value': k} for k in AIM_CENTER_DICT.keys()],
-                                value='chest',
-                                inline=True,
-                                style={'margin-left': 20, 'margin-bottom': 10, 'display': 'inline-block', 'textAlign': 'center'},
-                            )
-                        ], style={'width': '90%'}),
-                        html.Div([
-                            html.Center("Max distance (meters)"),
-                            dbc.Row([
-                                make_distance_slider_col(width=9),
-                                dbc.Col(html.Div(id=f"distance-div"), width=3)
-                            ])
-                        ]),
-                        html.Div([
-                            html.Div("Add ADS to TTK:", style={'display': 'inline-block'}),
-                            dbc.RadioItems(
-                                id='radio-plot-ads',
-                                options=[{'label': 'Yes', 'value': 'yes'},
-                                         {'label': 'No', 'value': 'no'}],
-                                value='no',
-                                inline=True,
-                                style={'margin-left': 20, 'display': 'inline-block'},
-                            )
-                        ]),
-                        html.Div([
-                            html.Div("Plot mode:", style={'display': 'inline-block'}),
-                            dbc.RadioItems(
-                                id='radio-plot-mode',
-                                options=[{'label': 'TTK', 'value': 'ttk'},
-                                         {'label': 'STK', 'value': 'stk'},
-                                         {'label': 'DPS', 'value': 'dps'}],
-                                value='ttk',
-                                inline=True,
-                                style={'margin-left': 20, 'display': 'inline-block'},
-                            )
-                        ], style={'margin-top': 5}),
-                        html.Br(),
-                        dbc.Button('Generate performance plot', id='plot-button', block=True),
-                        html.Div("", id='perf-plot-err', style={'textAlign': 'center', 'margin-top': 5}),
-                    ]
-                ), width=4
-            ),
+            dbc.Col(make_recoil_card(), width=8),
+            dbc.Col(make_params_card(), width=4),
         ]),
         html.Br(),
 
@@ -402,7 +425,7 @@ app.layout = html.Div(
         dcc.Store(data='ttk', id='perf-plot-store'),
         dcc.Store(id='results-store'),
         dbc.Card([
-            dbc.CardHeader("Estimated performance plot", id='perf-plot-header', style={'font-size': 24, 'textAlign': 'center'}),
+            dbc.CardHeader("Estimated performance plot", id='perf-plot-header'),
             dbc.CardBody([
                 html.Div([
                     dbc.Row([
@@ -457,7 +480,7 @@ app.layout = html.Div(
 
         # RECOIL SPREAD IMAGE SECTION
         dbc.Card([
-            dbc.CardHeader("Bullet distribution", style={'font-size': 24, 'textAlign': 'center'}),
+            dbc.CardHeader("Bullet distribution"),
             dbc.CardBody([
                 dbc.Row([
                     dbc.Col(

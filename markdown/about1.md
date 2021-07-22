@@ -18,20 +18,19 @@ recoil pattern.
 For game balance, developers typically design weapons such that damage and
 recoil are roughly correlated.
 This way, a higher skill level may be required to
-leverage the higher damage output of certain weapons, while weapons with low damage
+leverage the higher damage potential of certain weapons, while weapons with low damage
 output require much less recoil control.
 
 ### Recoil
-Recoil is the displacement of a player's crosshair after firing a round
-of ammunition.
 In Warzone, during sustained automatic fire, the magnitude and direction
-of the displacement after each round is dependent on the number of rounds fired so far.
+of the recoil displacement after each round fired is dependent on the 
+number of rounds fired so far.
 This time-dependence results in a "recoil pattern" that can be learned by players
 to improve their accuracy.
 Each displacement also has a (typically small) random component added to it in order
 to provide some randomness to the recoil pattern.
 This "jitter" effectively caps how well a player can use a weapon, since the jitter
-displacements are not predictable, but still incentivizes quick reactions to correct
+displacements are not predictable, but it still rewards quick reactions to correct
 for random deviations from the target.
 
 All of these traits make it impractical to quantify the effect of a weapon's recoil
@@ -44,9 +43,9 @@ important than the maximum displacements.
 Even more nuanced metrics for quantifying the recoil pattern morphology may still
 fail to capture how well a human player would be able to control the recoil.
 
-### Recoil-adjusted damage calculator
+### Recoil-adjusted damage simulator
 
-The recoil-adjusted damage calculator takes an empirical approach to evaluating weapon
+This tool takes an empirical approach to evaluating weapon
 recoil: it uses measurements of a human player's accuracy with each weapon to
 compute the TTK they would expect to achieve if they were to match that accuracy
 when using that weapon in combat.
@@ -117,5 +116,8 @@ middle of an engagement (typically this only occurs for very inaccurate
 players or weapons, or when aiming at very distant or small targets).
 
 ### Example
+
+The following examples are based on measurements and TrueGameData specs taken around July 22,
+after the Season 4 Reloaded update (and after the C58 hotfix).
 
 **Below is a video showing an example recoil test from which measurements can be taken.**
