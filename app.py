@@ -320,7 +320,7 @@ def make_params_card():
         ], style={'margin-top': 5}),
         html.Br(),
         dbc.Button('Generate performance plot', id='plot-button', block=True),
-        html.Div("", id='perf-plot-err', style={'textAlign': 'center', 'margin-top': 5}),
+        html.Div("", id='perf-plot-err', style={'color': 'red', 'textAlign': 'center', 'margin-top': 5}),
     ])
     card = dbc.Card([
         dbc.CardHeader(header),
@@ -382,11 +382,11 @@ app.layout = html.Div(
                     dcc.Input(id='link-input', type='text', value="", placeholder="Paste share link here",
                               style={'width': '400px', 'margin-right': '10px', 'display': 'inline-block'}),
                     dbc.Button('Fetch data', id='fetch-button', size='sm',
-                               style={'font-size': 16, 'margin-right': '10px', 'display': 'inline-block'}),
+                               style={'margin-right': '10px', 'display': 'inline-block'}),
                     dbc.Button('Use example data', id='example-button', size='sm',
-                               style={'font-size': 16, 'margin-right': '10px', 'display': 'inline-block'}),
+                               style={'margin-right': '10px', 'display': 'inline-block'}),
                     dbc.Button('Show help', id='fetch-help-button', size='sm',
-                               style={'font-size': 16, 'display': 'inline-block'}),
+                               style={'display': 'inline-block'}),
                     dbc.Collapse(
                         dcc.Markdown(FETCH_TEXT),
                         id='fetch-help-collapse',
@@ -425,7 +425,7 @@ app.layout = html.Div(
         dcc.Store(data='ttk', id='perf-plot-store'),
         dcc.Store(id='results-store'),
         dbc.Card([
-            dbc.CardHeader("Estimated performance plot", id='perf-plot-header'),
+            dbc.CardHeader("Simulated performance plot (Time-to-kill)", id='perf-plot-header'),
             dbc.CardBody([
                 html.Div([
                     dbc.Row([
@@ -711,7 +711,7 @@ def update_plot(n_clicks, x_mode, y_mode, show_nr, data, stored_mode, new_mode, 
         mode = stored_mode
         if data is not None and results is not None:
             fig = utils.plot_results(distances, data, results, mode=mode, log_x=log_x, log_y=log_y, show_nr=show_nr)
-    header = "Estimated performance plot " + header_mode[mode]
+    header = "Simulated performance plot " + header_mode[mode]
     if fig is None:
         fig = utils.plot_results(distances, data, results, mode=mode, log_x=log_x, log_y=log_y, show_nr=show_nr)
     return fig, msg, header, mode, results

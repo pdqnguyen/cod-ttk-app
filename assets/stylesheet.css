@@ -21,6 +21,10 @@
     text-align: center;
 }
 
+.btn {
+    font-size: 16px;
+}
+
 img[alt=TTK] { width: 100%; }
 img[alt=TTK_head] { width: 100%; }
 img[alt=TTK_ads] { width: 100%; }

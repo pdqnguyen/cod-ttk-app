@@ -82,7 +82,7 @@ To measure a player's effective damage output with a weapon, the player must do 
 following:
 
 1. Produce a weapon comparison page on TrueGameData for up to five weapons.
-   [Click here](https://www.truegamedata.com/?share=bTECUV) for an example.
+   [Click here](https://www.truegamedata.com/?share=GD6AFu) for an example.
 1. Enter a private match, training mode, or a plunder mode with one of their loadouts.
 1. Choose a target on a wall on which bullet impacts would be highly visible.
 1. Fire a full magazine at the target, controlling recoil to the best of their ability.
@@ -114,6 +114,45 @@ If STK exceeds magazine size, the reload time of the weapon (also extracted from
 TrueGameData) is added onto the TTK to simulate the time spent to reload in the
 middle of an engagement (typically this only occurs for very inaccurate
 players or weapons, or when aiming at very distant or small targets).
+
+### Limitations
+
+This method is only a first, admittedly elementary, step towards applying in-game
+recoil to damage output. There are a number of shortcomings, some of which
+have already been discussed.
+
+Obviously, the damage simulator inputs are dependent on the abilities and device
+configurations of the user; reproducibility of results between different users
+is not expected, or even likely. One player may find that one weapon yields the
+best TTK based on their measurements, but another player who has little experience
+controlling the recoil for that same weapon may find that its TTK is far worse when
+using this tool. Therefore, results should be treated as personalized predictions
+and not used to make broad generalizations about the viability of specific weapons.
+
+The damage simulation assumes that the target is stationary relative to the player.
+Against moving targets, a heavier emphasis is placed on low recoil,
+among other weapon traits like bullet velocity.
+It is also assumed that the target does not shoot back, so accuracy losses caused by
+damage flinch or visual distractions are ignored.
+Cover is also not taken into consideration, whereas in real game scenarios enemy
+targets often hide parts of their body behind cover. That said, the effect of cover
+is similar to that of distance: both decrease the target area, punishing high-recoil
+weapons more. It can therefore be inferred that the best-performing weapons
+as predicted by this tool would also be best against enemies behind cover.
+
+Although measuring recoil through many trials can suppress statistical uncertainty,
+systematic uncertainties are inevitable; the variations in recoil patterns
+using the same weapon make a perfect measurement of a player's recoil control unfeasible.
+
+Perhaps most importantly, aim assist cannot be accounted for using this method.
+However, since aim assist merely alters a controller user's sensitivity near enemies,
+the relative ordering of weapon performances measured using this tool is unlikely to
+be altered by aim assist, although the raw TTK values would probably be much lower.
+
+Lastly, although the tool covers a wide range of combat distances, the results are best
+interpreted for long-range encounters. At close range, so many other factors contribute
+to an encounter that recoil is much less of a concern. For this reason, this tool
+is recommended only for long-range weapons.
 
 ### Example
 

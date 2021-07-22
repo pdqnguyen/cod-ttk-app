@@ -15,11 +15,11 @@ The rest of the tabs are my own past measurements as examples.
 
 Round off to the nearest 0.05 degrees. This isn't meant to be super accurate anyway.
 
-**Example results**
+**Example plots**
 
 The first graph shows chest TTK up to 100 meters, with zero-recoil curves shown
 in dashed lines for comparison.
-See the corresponding [TrueGameData page](https://www.truegamedata.com/?share=bTECUV)
+See the corresponding [TrueGameData page](https://www.truegamedata.com/?share=EDHovz)
 for the full loadout specs.
 Adjusting for recoil results in a much greater simulated TTK for many of these weapons
 relative to their theoretical TTK.
@@ -40,15 +40,10 @@ except at close ranges, at which point SMGs would triumph anyway.
 
 ![TTK_head](/assets/images/example/head/ttk_nr.png)
 
-Below, ADS times are added to the TTKs, showing that ADS speed can still
+Below, ADS times are added to the chest damage TTKs, showing that ADS speed can still
 contribute significantly even at ranges where TTK is dominated by recoil effects.
 
 ![TTK_ads](/assets/images/example/chest/ttk_ads.png)
-
-From the above comparisons it seems clear that the Krig 6 is the dominant weapon when
-firing at the chest at long range, but the Kilo 141 and M13 have the potential to outperform
-the Krig 6 when taking headshots at medium to close ranges, or in encounters where
-a player needs to ADS as quickly as possible in response to immediate threats.
 
 
 ### Future work

@@ -1,28 +1,89 @@
 [
   {
-    "gun": "C58",
-    "fire_rate": 553,
-    "range_modifier": 0.4850000000000003,
-    "ads": 359,
+    "gun": "Kilo 141",
+    "fire_rate": 751,
+    "range_modifier": 0.595,
+    "ads": 409,
     "sprint_to_fire": 263,
     "tactical_sprint_to_fire": 392,
-    "bullet_velocity": 1192.5,
-    "reload_time": 2,
-    "mag_size": 25,
+    "bullet_velocity": 1299.9599999999998,
+    "reload_time": 2.36,
+    "mag_size": 60,
     "damage_profile": [
       {
-        "head": 58,
-        "chest": 37,
-        "stomach": 37,
-        "extremities": 37,
+        "head": 42,
+        "chest": 28,
+        "stomach": 28,
+        "extremities": 28,
         "dropoff": 0.0
       },
       {
-        "head": 53,
-        "chest": 34,
-        "stomach": 34,
-        "extremities": 34,
-        "dropoff": 37.12500000000001
+        "head": 34,
+        "chest": 23,
+        "stomach": 23,
+        "extremities": 23,
+        "dropoff": 48.6475
+      },
+      {
+        "head": 27,
+        "chest": 18,
+        "stomach": 18,
+        "extremities": 18,
+        "dropoff": 86.9275
+      }
+    ]
+  },
+  {
+    "gun": "M13",
+    "fire_rate": 891,
+    "range_modifier": 0.46630000000000016,
+    "ads": 361,
+    "sprint_to_fire": 263,
+    "tactical_sprint_to_fire": 392,
+    "bullet_velocity": 1258.56,
+    "reload_time": 2.37,
+    "mag_size": 60,
+    "damage_profile": [
+      {
+        "head": 36,
+        "chest": 24,
+        "stomach": 24,
+        "extremities": 24,
+        "dropoff": 0.0
+      },
+      {
+        "head": 30,
+        "chest": 20,
+        "stomach": 20,
+        "extremities": 20,
+        "dropoff": 49.854200000000006
+      }
+    ]
+  },
+  {
+    "gun": "Krig 6",
+    "fire_rate": 652,
+    "range_modifier": 0.4850000000000003,
+    "ads": 423,
+    "sprint_to_fire": 263,
+    "tactical_sprint_to_fire": 392,
+    "bullet_velocity": 1136.25,
+    "reload_time": 2.31,
+    "mag_size": 60,
+    "damage_profile": [
+      {
+        "head": 45,
+        "chest": 33,
+        "stomach": 33,
+        "extremities": 30,
+        "dropoff": 0.0
+      },
+      {
+        "head": 38,
+        "chest": 28,
+        "stomach": 28,
+        "extremities": 26,
+        "dropoff": 56.430000000000014
       }
     ]
   },
@@ -30,15 +91,15 @@
     "gun": "FARA",
     "fire_rate": 790,
     "range_modifier": 0.4850000000000003,
-    "ads": 369,
+    "ads": 471,
     "sprint_to_fire": 263,
     "tactical_sprint_to_fire": 392,
     "bullet_velocity": 1125,
     "reload_time": 3.17,
-    "mag_size": 30,
+    "mag_size": 60,
     "damage_profile": [
       {
-        "head": 37,
+        "head": 39,
         "chest": 29,
         "stomach": 29,
         "extremities": 29,
@@ -54,56 +115,29 @@
     ]
   },
   {
-    "gun": "Krig 6",
-    "fire_rate": 652,
+    "gun": "QBZ",
+    "fire_rate": 679,
     "range_modifier": 0.4850000000000003,
-    "ads": 342,
+    "ads": 348,
     "sprint_to_fire": 263,
     "tactical_sprint_to_fire": 392,
-    "bullet_velocity": 1136.25,
-    "reload_time": 0.1,
-    "mag_size": 30,
+    "bullet_velocity": 1192.5,
+    "reload_time": 2.31,
+    "mag_size": 60,
     "damage_profile": [
       {
-        "head": 45,
+        "head": 42,
         "chest": 33,
-        "stomach": 33,
-        "extremities": 30,
-        "dropoff": 0.0
-      },
-      {
-        "head": 39,
-        "chest": 28,
-        "stomach": 28,
-        "extremities": 26,
-        "dropoff": 56.430000000000014
-      }
-    ]
-  },
-  {
-    "gun": "XM4",
-    "fire_rate": 721,
-    "range_modifier": 0.4850000000000003,
-    "ads": 305,
-    "sprint_to_fire": 263,
-    "tactical_sprint_to_fire": 392,
-    "bullet_velocity": 1153.125,
-    "reload_time": 2.36,
-    "mag_size": 30,
-    "damage_profile": [
-      {
-        "head": 45,
-        "chest": 30,
         "stomach": 30,
-        "extremities": 30,
+        "extremities": 28,
         "dropoff": 0.0
       },
       {
-        "head": 41,
-        "chest": 27,
-        "stomach": 27,
-        "extremities": 27,
-        "dropoff": 32.67000000000001
+        "head": 36,
+        "chest": 28,
+        "stomach": 26,
+        "extremities": 24,
+        "dropoff": 46.03500000000001
       }
     ]
   }
