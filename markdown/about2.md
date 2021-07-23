@@ -44,12 +44,3 @@ Below, ADS times are added to the chest damage TTKs, showing that ADS speed can 
 contribute significantly even at ranges where TTK is dominated by recoil effects.
 
 ![TTK_ads](/assets/images/example/chest/ttk_ads.png)
-
-
-### Future work
-Here are some things that *may* be implemented in the future.
-- [ ]  Segment plot: horizontal bar showing dominant weapon at each distance bin.
-- [ ]  Better hitbox geometry, or average over various hitboxes representing different encounter angles.
-- [ ]  Add a slider for enemy HP.
-- [ ]  Add option of including/excluding reload time.
-- [ ]  Show percentage of shots hitting each hitbox region (e.g. 10% head, 25% chest, etc.).
