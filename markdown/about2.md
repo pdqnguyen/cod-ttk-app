@@ -26,7 +26,7 @@ relative to their theoretical TTK.
 The FARA, despite having the lowest long-range TTK on paper, does noticeably worse
 than the weaker Krig 6 due to its higher recoil.
 
-![TTK](/assets/images/example/chest/ttk_nr.png)
+![TTK](/assets/images/example/chest/ttk.png)
 
 Below are headshot TTKs (with zero-recoil curves shown as well).
 These show that, at least based on my recoil measurements,
@@ -38,7 +38,7 @@ whereas on the other extreme, weapons with very high recoil and/or low headshot
 multipliers such as the FARA are virtually incapable of benefiting from headshots
 except at close ranges, at which point SMGs would triumph anyway.
 
-![TTK_head](/assets/images/example/head/ttk_nr.png)
+![TTK_head](/assets/images/example/head/ttk.png)
 
 Below, ADS times are added to the chest damage TTKs, showing that ADS speed can still
 contribute significantly even at ranges where TTK is dominated by recoil effects.

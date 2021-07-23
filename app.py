@@ -696,7 +696,7 @@ def update_plot(n_clicks, x_mode, y_mode, show_nr, data, stored_mode, new_mode, 
     }
     log_x = (x_mode == 'log')
     log_y = (y_mode == 'log')
-    distances = np.linspace(1, d_max, d_max)
+    distances = np.linspace(10, d_max, d_max)
     fig = None
     msg = ""
 

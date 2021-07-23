@@ -240,16 +240,27 @@ def plot_results(distances, data, results, mode='ttk', log_x=False, log_y=False,
 def update_fig(fig, mode='ttk', log_x=False, log_y=False, show_nr=False):
     fig_data = fig['data']
     if len(fig_data) > 0:
+        x_min = min([min(trace['x']) for trace in fig_data])
         x_max = max([max(trace['x']) for trace in fig_data])
         y_min = min([min(trace['y']) for trace in fig_data])
         y_max = max([max(trace['y']) for trace in fig_data])
         if log_x:
             if x_max >= 100:
-                fig.update_xaxes(title_text="Distance [m]", range=[1, np.log10(x_max)], type='log', tickformat='.1r')
+                fig.update_xaxes(
+                    title_text="Distance [m]",
+                    range=[np.log10(x_min), np.log10(x_max)],
+                    type='log',
+                    tickformat='.1r'
+                )
             else:
-                fig.update_xaxes(title_text="Distance [m]", range=[1, np.log10(x_max)], type='log', tickformat=None)
+                fig.update_xaxes(
+                    title_text="Distance [m]",
+                    range=[np.log10(x_min), np.log10(x_max)],
+                    type='log',
+                    tickformat=None
+                )
         else:
-            fig.update_xaxes(title_text="Distance [m]", range=[0, x_max], type='linear')
+            fig.update_xaxes(title_text="Distance [m]", range=[x_min, x_max], type='linear')
         y_label = {
             'dps': "Damage per second",
             'stk': "Shots-to-kill",
